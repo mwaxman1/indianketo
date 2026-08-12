@@ -1,0 +1,47 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+
+const roundups = [
+  { slug: "best-keto-indian-cookbooks", title: "Best Keto Indian Cookbooks for Authentic Low-Carb Cooking", description: "The top 5 cookbooks that combine Indian flavors with keto macros. Perfect for beginners and experienced cooks alike.", date: "2026-08-10" },
+  { slug: "best-spice-grinders-indian-keto", title: "Best Spice Grinders for Indian Keto Cooking", description: "Freshly ground spices make all the difference. Our top picks for electric and manual spice grinders.", date: "2026-08-09" },
+  { slug: "best-keto-flours-indian-cooking", title: "Best Keto Flours for Indian Cooking: Almond, Coconut & More", description: "The essential low-carb flours for making keto naan, roti, and Indian desserts. Compare prices, carbs, and best uses.", date: "2026-08-08" },
+  { slug: "best-nonstick-pans-indian-cooking", title: "Best Nonstick Pans for Indian Keto Cooking", description: "From tadka to paneer tikka, these nonstick pans handle high-heat Indian cooking without the carbs sticking.", date: "2026-08-07" },
+];
+---
+
+<BaseLayout
+  title="Indian Keto Product Roundups — Best Tools & Ingredients"
+  description="Curated product roundups for your Indian keto kitchen. Best cookbooks, spice grinders, keto flours, and cookware for low-carb Indian cooking."
+>
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-display font-semibold text-primary mb-4">Product Roundups</h1>
+        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+          Curated recommendations for your Indian keto kitchen. Every product reviewed for quality and keto compatibility.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {roundups.map((roundup) => (
+          <a href={`/roundups/${roundup.slug}`} class="card card-hover">
+            <div class="card-body">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="badge badge-accent">Product Roundup</span>
+                <time class="text-sm text-neutral-500">{new Date(roundup.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+              </div>
+              <h2 class="text-xl font-semibold text-primary mb-2">{roundup.title}</h2>
+              <p class="text-neutral-600 text-sm">{roundup.description}</p>
+              <div class="mt-4 flex items-center text-accent font-medium text-sm">
+                <span>View Roundup</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

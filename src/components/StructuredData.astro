@@ -1,0 +1,146 @@
+---
+// Structured data component for Indian Keto
+export interface Props {
+  type?: 'website' | 'product' | 'article' | 'organization';
+  data?: any;
+}
+
+const { type = 'website', data } = Astro.props;
+
+function generateWebsiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Indian Keto",
+    "alternateName": "Keto Indian Food & Recipes",
+    "url": "https://indianketo.com",
+    "description": "Your guide to following a keto diet with Indian food. Authentic Indian keto recipes, meal plans, and product recommendations.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Indian Keto",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://indianketo.com/images/logo.png",
+        "width": 200,
+        "height": 60
+      }
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://indianketo.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+}
+
+function generateOrganizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Indian Keto",
+    "alternateName": "Keto Indian Food & Recipes",
+    "url": "https://indianketo.com",
+    "logo": "https://indianketo.com/images/logo.png",
+    "description": "Expert guides and recipes for keto Indian food and low-carb Indian cooking",
+    "foundingDate": "2026",
+    "founders": [{
+      "@type": "Person",
+      "name": "Indian Keto Team"
+    }],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "hello@indianketo.com",
+      "areaServed": "US",
+      "availableLanguage": "English"
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressCountry": "US"
+    }
+  };
+}
+
+function generateArticleSchema(article: any) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.description,
+    "author": {
+      "@type": "Person",
+      "name": article.author || "Indian Keto Team"
+    },
+    "datePublished": article.publishDate,
+    "dateModified": article.updatedDate || article.publishDate,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": article.url
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Indian Keto",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://indianketo.com/images/logo.png"
+      }
+    }
+  };
+}
+
+function generateProductSchema(product: any) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.title,
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand
+    },
+    "image": product.images?.map((img: string) => new URL(img, "https://indianketo.com").href),
+    "offers": {
+      "@type": "Offer",
+      "url": product.affiliateUrl,
+      "priceCurrency": "USD",
+      "price": product.price,
+      "availability": "https://schema.org/InStock",
+      "seller": {
+        "@type": "Organization",
+        "name": "Amazon"
+      }
+    },
+    "aggregateRating": product.rating ? {
+      "@type": "AggregateRating",
+      "ratingValue": product.rating,
+      "reviewCount": product.reviewCount || 1,
+      "bestRating": 5,
+      "worstRating": 1
+    } : undefined
+  };
+}
+
+function generateSchema() {
+  switch (type) {
+    case 'website':
+      return generateWebsiteSchema();
+    case 'organization':
+      return generateOrganizationSchema();
+    case 'article':
+      return data ? generateArticleSchema(data) : null;
+    case 'product':
+      return data ? generateProductSchema(data) : null;
+    default:
+      return generateWebsiteSchema();
+  }
+}
+
+const schema = generateSchema();
+---
+
+{schema && (
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+)}

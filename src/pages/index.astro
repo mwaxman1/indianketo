@@ -1,0 +1,311 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import StructuredData from "@/components/StructuredData.astro";
+
+const homepageFAQ = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Can you eat Indian food on a keto diet?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes! Many Indian dishes are naturally keto-friendly or can be easily adapted. Paneer dishes, tandoori meats, cauliflower rice biryani, and coconut-based curries are all excellent low-carb options. The key is avoiding rice, naan, roti, potatoes, and sugar-laden sauces while embracing the rich spice traditions of Indian cooking." }
+    },
+    {
+      "@type": "Question",
+      "name": "What are the best Indian keto recipes for beginners?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Start with keto paneer butter masala (use heavy cream instead of sugar), tandoori chicken, cauliflower rice pulao, egg curry, and palak paneer. These dishes are naturally low in carbs, high in fat and protein, and use ingredients you can find at any Indian grocery store." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is paneer keto-friendly?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Absolutely. Paneer is one of the best keto foods in Indian cuisine. A 100g serving contains approximately 25g protein, 20g fat, and only 1-2g net carbs. It's versatile, filling, and works in everything from curries to grilled skewers to scrambled 'egg' substitutes." }
+    },
+    {
+      "@type": "Question",
+      "name": "What can I use instead of rice and roti on keto?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Cauliflower rice is the most popular rice substitute — it absorbs Indian spices beautifully. For roti alternatives, try almond flour roti, coconut flour paratha, or psyllium husk flatbreads. Many keto dieters also enjoy their curries with a side of sautéed greens or simply eat them as soup-like dishes." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I make keto Indian food taste authentic?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The secret is in the spices. Stock your pantry with cumin, coriander, turmeric, garam masala, cardamom, cloves, and fenugreek (methi). These spices are carb-free and deliver the authentic Indian flavors you love. Use ghee as your primary cooking fat — it's traditional, keto-friendly, and enhances every dish." }
+    }
+  ]
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Website",
+  "name": "Indian Keto",
+  "description": "Your guide to following a keto diet with Indian food. Authentic Indian keto recipes, meal plans, and product recommendations.",
+  "url": "https://indianketo.com",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://indianketo.com/search?q={search_term_string}"
+    },
+    "query-input": "required name=search_term_string"
+  }
+};
+---
+
+<BaseLayout
+  title="Indian Keto — Your Guide to Keto Indian Food, Recipes & Meal Plans (2026)"
+  description="Discover how to follow a keto diet with authentic Indian food. Keto Indian recipes, meal plans, product roundups, and expert guides for low-carb Indian cooking."
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(homepageFAQ)} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <!-- Hero Section -->
+  <section class="relative bg-white overflow-hidden">
+    <div class="absolute inset-0">
+      <div class="absolute inset-0 opacity-[0.02]">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDYwIDAgTCAwIDAgMCA2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')]"></div>
+      </div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24 xl:py-32">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="max-w-2xl">
+          <div class="inline-flex items-center px-4 py-2 bg-accent/10 text-accent rounded-full text-sm font-semibold mb-6">
+            <span class="w-2 h-2 bg-accent rounded-full mr-3"></span>
+            Indian Keto Made Simple · Updated August 2026
+          </div>
+
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-display font-semibold leading-tight mb-6 text-primary">
+            Keto Indian Food
+            <span class="relative">
+              <span class="text-accent">Made Delicious</span>
+              <svg class="absolute -bottom-2 left-0 w-full h-3 text-accent/20" viewBox="0 0 300 12" fill="currentColor">
+                <path d="M0,8 Q150,0 300,8 L300,12 L0,12 Z"/>
+              </svg>
+            </span>
+          </h1>
+
+          <p class="text-lg sm:text-xl text-neutral-700 leading-relaxed mb-8 max-w-xl">
+            Discover how to enjoy authentic Indian flavors while staying in ketosis. Expert guides, tested recipes, and product recommendations for your low-carb Indian kitchen.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 mb-12">
+            <a
+              href="/articles"
+              class="group inline-flex items-center justify-center px-8 py-4 bg-primary text-white font-semibold text-lg rounded-md hover:bg-primary-600 transition-all duration-300 shadow-lg hover:shadow-xl focus:ring-2 focus:ring-accent focus:ring-offset-2"
+            >
+              <span>Read Our Guides</span>
+              <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a
+              href="/roundups"
+              class="group inline-flex items-center justify-center px-8 py-4 border-2 border-primary text-primary font-semibold text-lg rounded-md hover:bg-primary hover:text-white transition-all duration-300 focus:ring-2 focus:ring-accent focus:ring-offset-2"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              <span>Product Roundups</span>
+            </a>
+          </div>
+
+          <!-- Trust Indicators -->
+          <div class="grid grid-cols-3 gap-6 text-center">
+            <div class="group">
+              <div class="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="text-sm font-semibold text-primary">Expert Guides</div>
+              <div class="text-xs text-neutral-600">8 Pillar Articles</div>
+            </div>
+            <div class="group">
+              <div class="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+              </div>
+              <div class="text-sm font-semibold text-primary">Keto Approved</div>
+              <div class="text-xs text-neutral-600">Authentic Flavors</div>
+            </div>
+            <div class="group">
+              <div class="w-12 h-12 bg-accent/10 text-accent rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <div class="text-sm font-semibold text-primary">Updated Weekly</div>
+              <div class="text-xs text-neutral-600">Fresh Content</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Image -->
+        <div class="relative mt-8 lg:mt-0">
+          <div class="aspect-square rounded-lg overflow-hidden shadow-lg bg-primary-50 flex items-center justify-center">
+            <div class="text-center p-8">
+              <div class="text-8xl mb-4">🥘</div>
+              <p class="text-primary font-display text-2xl font-semibold">Indian Keto</p>
+              <p class="text-neutral-600 mt-2">Authentic Flavors, Low-Carb Lifestyle</p>
+            </div>
+          </div>
+          <div class="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-accent text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-semibold shadow-lg text-sm sm:text-base">
+            🥑 Keto + Indian
+          </div>
+          <div class="absolute -bottom-2 -left-2 sm:-bottom-4 sm:-left-4 bg-white text-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-full font-semibold shadow-lg text-sm sm:text-base">
+            🌿 8 Pillar Articles
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Articles Section -->
+  <section class="py-16 bg-neutral-50">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl lg:text-4xl font-display font-semibold text-primary mb-4">
+          Essential Indian Keto Guides
+        </h2>
+        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+          Everything you need to know about following a keto diet with Indian food
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <a href="/articles/indian-keto-diet" class="card card-hover">
+          <div class="card-body">
+            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Indian Keto Diet Guide</h3>
+            <p class="text-sm text-neutral-600">Complete beginner's guide to keto with Indian food</p>
+          </div>
+        </a>
+
+        <a href="/articles/indian-keto-recipes" class="card card-hover">
+          <div class="card-body">
+            <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Indian Keto Recipes</h3>
+            <p class="text-sm text-neutral-600">25+ authentic Indian dishes made keto-friendly</p>
+          </div>
+        </a>
+
+        <a href="/articles/indian-keto-meal-plan" class="card card-hover">
+          <div class="card-body">
+            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Indian Keto Meal Plan</h3>
+            <p class="text-sm text-neutral-600">7-day meal plan with Indian keto breakfast, lunch, dinner</p>
+          </div>
+        </a>
+
+        <a href="/articles/keto-paneer-recipes" class="card card-hover">
+          <div class="card-body">
+            <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-primary mb-2">Keto Paneer Recipes</h3>
+            <p class="text-sm text-neutral-600">10+ delicious paneer dishes under 5g net carbs</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="text-center mt-12">
+        <a
+          href="/articles"
+          class="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary-600 transition-colors font-semibold text-lg"
+        >
+          View All Articles
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter CTA -->
+  <section class="py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+        <h2 class="text-2xl font-display font-semibold text-primary mb-3">Get Free Indian Keto Recipes Weekly</h2>
+        <p class="text-neutral-600 mb-6 max-w-xl mx-auto">Join our newsletter for weekly Indian keto recipes, meal plans, and product recommendations.</p>
+        <form class="kc-email-capture flex flex-col sm:flex-row gap-3 max-w-md mx-auto" data-status="idle">
+          <input
+            type="email"
+            name="email"
+            placeholder="Your email address"
+            required
+            class="flex-1 px-4 py-3 rounded-lg border border-neutral-300 text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <input type="hidden" name="referrer" value="homepage" />
+          <button
+            type="submit"
+            class="bg-accent hover:bg-accent-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
+          >
+            Subscribe Free
+          </button>
+        </form>
+        <p class="kc-email-note text-neutral-500 text-xs mt-3"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How We Help Section -->
+  <section class="py-16">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl lg:text-4xl font-display font-semibold text-primary mb-4">
+          How Indian Keto Helps You
+        </h2>
+        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
+          Practical, tested guidance for real people who love Indian food
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white border border-neutral-200 rounded-lg p-6 shadow-sm">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div class="text-3xl font-semibold text-primary mb-1">8</div>
+          <p class="text-neutral-600">In-depth pillar articles covering every aspect of Indian keto</p>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-lg p-6 shadow-sm">
+          <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+          </div>
+          <div class="text-3xl font-semibold text-primary mb-1">4</div>
+          <p class="text-neutral-600">Curated product roundups for your Indian keto kitchen</p>
+        </div>
+
+        <div class="bg-white border border-neutral-200 rounded-lg p-6 shadow-sm">
+          <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="text-3xl font-semibold text-primary mb-1">August 2026</div>
+          <p class="text-neutral-600">Content reviewed and updated for accuracy this month</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

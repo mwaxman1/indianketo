@@ -1,0 +1,65 @@
+---
+// Newsletter signup form — Loops placeholder
+---
+
+<div class="text-center">
+  <h2 class="text-2xl font-display font-semibold text-white mb-3">Get Free Indian Keto Recipes Weekly</h2>
+  <p class="text-primary-100 mb-6 max-w-xl mx-auto">Join our newsletter for weekly Indian keto recipes, meal plans, and product recommendations delivered to your inbox.</p>
+  <form class="kc-email-capture flex flex-col sm:flex-row gap-3 max-w-md mx-auto" data-status="idle">
+    <input
+      type="email"
+      name="email"
+      placeholder="Your email address"
+      required
+      class="flex-1 px-4 py-3 rounded-lg text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent"
+    />
+    <input type="hidden" name="referrer" value="footer" />
+    <button
+      type="submit"
+      class="bg-accent hover:bg-accent-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
+    >
+      Subscribe
+    </button>
+  </form>
+  <p class="kc-email-note text-primary-100 text-xs mt-3"></p>
+  <p class="text-primary-200 text-xs mt-2">No spam. Unsubscribe anytime.</p>
+</div>
+
+<script is:inline>
+  document.addEventListener('submit', async (e) => {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement) || !form.classList.contains('kc-email-capture')) return;
+    e.preventDefault();
+    const note = form.querySelector('.kc-email-note');
+    const btn = form.querySelector('button[type="submit"]');
+    const data = new FormData(form);
+    const email = String(data.get('email') ?? '').trim();
+    if (!email) return;
+    form.setAttribute('data-status', 'loading');
+    if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
+    try {
+      // FLAG: Replace with real Loops endpoint
+      const res = await fetch('/api/loops-subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, referrer: String(data.get('referrer') ?? '') }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.success !== false) {
+        form.setAttribute('data-status', 'success');
+        if (note) note.textContent = json.message || 'Subscribed! Check your inbox to confirm.';
+        if (btn) btn.textContent = 'Subscribed ✓';
+        const input = form.querySelector('input[type="email"]');
+        if (input) input.value = '';
+      } else {
+        form.setAttribute('data-status', 'error');
+        if (note) note.textContent = json.message || 'Something went wrong. Please try again.';
+        if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+      }
+    } catch {
+      form.setAttribute('data-status', 'error');
+      if (note) note.textContent = 'Network error. Please try again.';
+      if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+    }
+  });
+</script>

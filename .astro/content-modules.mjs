@@ -1,0 +1,15 @@
+
+export default new Map([
+["src/content/articles/indian-keto-breakfast.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Findian-keto-breakfast.mdx&astroContentModuleFlag=true")],
+["src/content/articles/indian-keto-diet.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Findian-keto-diet.mdx&astroContentModuleFlag=true")],
+["src/content/articles/indian-keto-meal-plan.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Findian-keto-meal-plan.mdx&astroContentModuleFlag=true")],
+["src/content/articles/indian-keto-recipes.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Findian-keto-recipes.mdx&astroContentModuleFlag=true")],
+["src/content/articles/indian-keto-snacks.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Findian-keto-snacks.mdx&astroContentModuleFlag=true")],
+["src/content/articles/keto-cauliflower-rice-indian.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Fketo-cauliflower-rice-indian.mdx&astroContentModuleFlag=true")],
+["src/content/articles/keto-paneer-recipes.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Fketo-paneer-recipes.mdx&astroContentModuleFlag=true")],
+["src/content/articles/keto-roti-alternatives.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Farticles%2Fketo-roti-alternatives.mdx&astroContentModuleFlag=true")],
+["src/content/roundups/best-keto-flours-indian-cooking.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Froundups%2Fbest-keto-flours-indian-cooking.mdx&astroContentModuleFlag=true")],
+["src/content/roundups/best-keto-indian-cookbooks.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Froundups%2Fbest-keto-indian-cookbooks.mdx&astroContentModuleFlag=true")],
+["src/content/roundups/best-nonstick-pans-indian-cooking.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Froundups%2Fbest-nonstick-pans-indian-cooking.mdx&astroContentModuleFlag=true")],
+["src/content/roundups/best-spice-grinders-indian-keto.mdx", () => import("astro:content-layer-deferred-module?astro%3Acontent-layer-deferred-module=&fileName=src%2Fcontent%2Froundups%2Fbest-spice-grinders-indian-keto.mdx&astroContentModuleFlag=true")]]);
+		

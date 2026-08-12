@@ -1,0 +1,465 @@
+@import "tailwindcss";
+
+/* ── Indian Keto Design Tokens ─────────────────────────────────── */
+@theme {
+  /* Primary: Deep green (curry leaf / spinach) */
+  --color-primary: #1B5E20;
+  --color-primary-50: #E8F5E9;
+  --color-primary-100: #C8E6C9;
+  --color-primary-200: #A5D6A7;
+  --color-primary-300: #81C784;
+  --color-primary-400: #66BB6A;
+  --color-primary-500: #1B5E20;
+  --color-primary-600: #2E7D32;
+  --color-primary-700: #1A4D1C;
+  --color-primary-800: #0D2E0F;
+  --color-primary-900: #071A08;
+
+  /* Accent: Warm turmeric / saffron gold */
+  --color-accent: #D4A017;
+  --color-accent-50: #FDF8E8;
+  --color-accent-100: #FBF0D0;
+  --color-accent-200: #F7E1A1;
+  --color-accent-300: #F3D272;
+  --color-accent-400: #E8B830;
+  --color-accent-500: #D4A017;
+  --color-accent-600: #B88914;
+  --color-accent-700: #8A6710;
+  --color-accent-800: #5C450B;
+  --color-accent-900: #2E2205;
+
+  /* Amazon orange */
+  --color-amazon: #FF9900;
+  --color-amazon-dark: #e88900;
+
+  /* Neutrals */
+  --color-neutral-900: #0F1111;
+  --color-neutral-100: #F7F7F5;
+
+  /* Form states */
+  --color-success: #1B7F5F;
+  --color-success-50: #ECFDF5;
+  --color-success-100: #D1FAE5;
+  --color-success-200: #A7F3D0;
+  --color-success-700: #15803D;
+  --color-success-800: #166534;
+  --color-success-900: #14532D;
+  --color-warning: #D97706;
+  --color-danger: #B91C1C;
+  --color-danger-50: #FEF2F2;
+  --color-danger-100: #FEE2E2;
+  --color-danger-200: #FECACA;
+  --color-danger-800: #991B1B;
+  --color-danger-900: #7F1D1D;
+
+  /* Fonts */
+  --font-display: "Inter Tight", "Inter", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Font sizes */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 20px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+  --text-3xl: 28px;
+  --text-4xl: 48px;
+  --text-5xl: 48px;
+
+  --max-width-prose: 48rem;
+
+  --shadow-primary: 0 10px 15px -3px rgba(27, 94, 32, 0.1), 0 4px 6px -2px rgba(27, 94, 32, 0.05);
+  --shadow-border: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+}
+
+@plugin "@tailwindcss/typography";
+
+/* ── Base Layer ───────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    --color-primary: #1B5E20;
+    --color-primary-50: #E8F5E9;
+    --color-primary-100: #C8E6C9;
+    --color-primary-600: #2E7D32;
+    --color-accent: #D4A017;
+    --color-accent-600: #B88914;
+    --color-amazon: #FF9900;
+    --color-amazon-dark: #e88900;
+    --color-neutral-900: #0F1111;
+    --color-neutral-100: #F7F7F5;
+    --color-success: #1B7F5F;
+    --color-warning: #D97706;
+    --color-danger: #B91C1C;
+
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 0.75rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-primary: 0 10px 15px -3px rgba(27, 94, 32, 0.1), 0 4px 6px -2px rgba(27, 94, 32, 0.05);
+    --shadow-border: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    color: var(--color-neutral-900);
+    background-color: var(--color-neutral-100);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-primary);
+    margin-bottom: 0.5em;
+    letter-spacing: -0.02em;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+  }
+
+  a:hover {
+    color: var(--color-primary-600);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: white;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-neutral-100);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: var(--radius-md);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-primary-600);
+  }
+
+  img {
+    content-visibility: auto;
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ── Components Layer ─────────────────────────────────────────────────────── */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-white hover:bg-primary-600 focus:ring-accent;
+  }
+
+  .btn-secondary {
+    @apply bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-accent;
+  }
+
+  .btn-ghost {
+    @apply text-primary hover:underline focus:ring-accent;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-white hover:bg-accent-600 focus:ring-accent;
+  }
+
+  .btn-amazon {
+    @apply bg-amazon text-white hover:bg-amazon-dark focus:ring-accent;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  .btn-xl {
+    @apply px-8 py-4 text-lg;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-lg overflow-hidden;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  .card-header {
+    @apply p-6 pb-0;
+  }
+
+  .card-footer {
+    @apply p-6 pt-0;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-primary text-white;
+  }
+
+  .badge-accent {
+    @apply bg-accent text-white;
+  }
+
+  .badge-success {
+    @apply bg-success text-white;
+  }
+
+  .badge-warning {
+    @apply bg-warning text-white;
+  }
+
+  .badge-danger {
+    @apply bg-danger text-white;
+  }
+
+  .badge-neutral {
+    @apply bg-neutral-200 text-neutral-800;
+  }
+
+  .form-input {
+    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent;
+  }
+
+  .form-textarea {
+    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent;
+    resize: vertical;
+  }
+
+  .form-select {
+    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent pr-10 bg-white;
+  }
+
+  .form-checkbox {
+    @apply h-4 w-4 text-primary focus:ring-accent border-neutral-300 rounded;
+  }
+
+  .form-radio {
+    @apply h-4 w-4 text-primary focus:ring-accent border-neutral-300;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-neutral-700 mb-1;
+  }
+
+  .form-error {
+    @apply text-sm text-danger mt-1;
+  }
+
+  .form-help {
+    @apply text-sm text-neutral-600 mt-1;
+  }
+
+  .loading {
+    @apply animate-pulse;
+  }
+
+  .loading-skeleton {
+    @apply bg-neutral-200 rounded-lg animate-pulse;
+  }
+
+  .spinner {
+    @apply animate-spin h-5 w-5 text-current;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .content-auto {
+    content-visibility: auto;
+  }
+
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-inset-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-area-inset-right {
+    padding-right: env(safe-area-inset-right);
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+
+    .print-only {
+      display: block !important;
+    }
+
+    body {
+      background: white !important;
+      color: black !important;
+    }
+
+    .card {
+      box-shadow: none !important;
+      border: 1px solid #ddd !important;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    .btn {
+      border: 2px solid currentColor;
+    }
+
+    .card {
+      border: 1px solid var(--color-neutral-900);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    .scroll-smooth {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* ── Utilities Layer ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  .text-shadow-xl {
+    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .not-sr-only {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  .prose-keto {
+    @apply prose prose-lg max-w-none prose-headings:font-display prose-headings:text-primary prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-p:text-neutral-700 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-neutral-900 prose-li:text-neutral-700 prose-blockquote:border-primary prose-blockquote:bg-primary-50 prose-blockquote:rounded-lg prose-blockquote:p-4 prose-img:rounded-lg prose-img:shadow-lg;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-bounce-in {
+    animation: bounceIn 0.6s ease-out;
+  }
+
+  .will-change-auto {
+    will-change: auto;
+  }
+
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .contain-layout {
+    contain: layout;
+  }
+
+  .contain-paint {
+    contain: paint;
+  }
+
+  .contain-size {
+    contain: size;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+}
