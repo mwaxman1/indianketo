@@ -1,50 +1,22 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import StructuredData from "@/components/StructuredData.astro";
+import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const slugs = [
-    "best-keto-indian-cookbooks",
-    "best-spice-grinders-indian-keto",
-    "best-keto-flours-indian-cooking",
-    "best-nonstick-pans-indian-cooking",
-  ];
-  return slugs.map((slug) => ({ params: { slug } }));
+  const roundups = await getCollection("roundups");
+  return roundups.map((roundup) => ({
+    params: { slug: roundup.id },
+    props: { roundup },
+  }));
 }
 
-const { slug } = Astro.params;
-
-const roundups: Record<string, { title: string; description: string; publishDate: string }> = {
-  "best-keto-indian-cookbooks": {
-    title: "Best Keto Indian Cookbooks for Authentic Low-Carb Cooking (2026)",
-    description: "The top 5 cookbooks that combine Indian flavors with keto macros. Perfect for beginners and experienced cooks alike.",
-    publishDate: "2026-08-10",
-  },
-  "best-spice-grinders-indian-keto": {
-    title: "Best Spice Grinders for Indian Keto Cooking (2026)",
-    description: "Freshly ground spices make all the difference. Our top picks for electric and manual spice grinders.",
-    publishDate: "2026-08-09",
-  },
-  "best-keto-flours-indian-cooking": {
-    title: "Best Keto Flours for Indian Cooking: Almond, Coconut & More (2026)",
-    description: "The essential low-carb flours for making keto naan, roti, and Indian desserts. Compare prices, carbs, and best uses.",
-    publishDate: "2026-08-08",
-  },
-  "best-nonstick-pans-indian-cooking": {
-    title: "Best Nonstick Pans for Indian Keto Cooking (2026)",
-    description: "From tadka to paneer tikka, these nonstick pans handle high-heat Indian cooking without the carbs sticking.",
-    publishDate: "2026-08-07",
-  },
-};
-
-const roundup = roundups[slug as string];
-if (!roundup) {
-  return Astro.redirect("/404");
-}
+const { roundup } = Astro.props;
+const { Content } = await render(roundup);
 
 const productData = {
-  title: roundup.title,
-  description: roundup.description,
+  title: roundup.data.title,
+  description: roundup.data.description,
   brand: "Various",
   images: ["/images/og-default.png"],
   affiliateUrl: "#",
@@ -55,9 +27,9 @@ const productData = {
 ---
 
 <BaseLayout
-  title={roundup.title}
-  description={roundup.description}
-  canonical={`https://indianketo.com/roundups/${slug}`}
+  title={roundup.data.title}
+  description={roundup.data.description}
+  canonical={`https://indianketo.com/roundups/${roundup.id}`}
 >
   <Fragment slot="head">
     <StructuredData type="product" data={productData} />
@@ -68,16 +40,23 @@ const productData = {
       <header class="mb-8">
         <div class="flex items-center gap-2 mb-4">
           <span class="badge badge-accent">Product Roundup</span>
-          <time class="text-sm text-neutral-500">{new Date(roundup.publishDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
+          <time class="text-sm text-neutral-500">{new Date(roundup.data.publishDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
         </div>
-        <h1 class="text-4xl font-display font-semibold text-primary mb-4">{roundup.title}</h1>
-        <p class="text-lg text-neutral-600">{roundup.description}</p>
+        <h1 class="text-4xl font-display font-semibold text-primary mb-4">{roundup.data.title}</h1>
+        <p class="text-lg text-neutral-600">{roundup.data.description}</p>
       </header>
 
       <div class="prose-keto">
-        <p><em>Full product roundup content is being loaded. This page will feature detailed product comparisons, pros and cons, and affiliate links to recommended products.</em></p>
-        <p>Our team is testing and reviewing the best products for your Indian keto kitchen. Check back soon for the complete roundup.</p>
-        <p><a href="/roundups">← Back to all roundups</a></p>
+        <Content />
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-neutral-200">
+        <a href="/roundups" class="text-primary hover:text-primary-600 font-medium flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to all roundups
+        </a>
       </div>
     </div>
   </article>
