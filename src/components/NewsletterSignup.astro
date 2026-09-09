@@ -1,5 +1,5 @@
 ---
-// Newsletter signup form — Loops placeholder
+// Newsletter signup form — direct Sequenzy POST
 ---
 
 <div class="text-center">
@@ -38,11 +38,11 @@
     form.setAttribute('data-status', 'loading');
     if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
     try {
-      // FLAG: Replace with real Loops endpoint
-      const res = await fetch('/api/loops-subscribe', {
+      // Direct Sequenzy form POST (no intermediary endpoint)
+      const res = await fetch('https://api.sequenzy.com/api/v1/forms/s3ean6yt56t58wha6iklj9uo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, referrer: String(data.get('referrer') ?? '') }),
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+        body: new URLSearchParams({ email, referrer: String(data.get('referrer') ?? '') }).toString(),
       });
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.success !== false) {
