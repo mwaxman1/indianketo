@@ -21,6 +21,8 @@ const roundups = defineCollection({
     description: z.string(),
     publishDate: z.string(),
     updatedDate: z.string().optional(),
+    // Photo slug from src/data/photos.ts — drives the card and hero image.
+    image: z.string().optional(),
     products: z.array(z.object({
       name: z.string(),
       description: z.string(),

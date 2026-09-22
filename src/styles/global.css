@@ -1,4 +1,121 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* ── Self-hosted webfonts (public/fonts) ──────────────────────────────────── */
+/* Inter → UI + body. Fraunces → editorial display. 14 faces, latin + latin-ext. */
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext-400.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-latin-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext-500.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/inter-latin-500.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext-600.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-latin-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin-ext-700.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-latin-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-ext-400.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-400.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-ext-600.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-600.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-ext-700.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/fraunces-latin-700.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 
 /* ── Indian Keto Design Tokens ─────────────────────────────────── */
 @theme {
@@ -32,9 +149,12 @@
   --color-amazon: #FF9900;
   --color-amazon-dark: #e88900;
 
-  /* Neutrals */
+  /* Neutrals — warm, so photography sits on paper not on grey */
   --color-neutral-900: #0F1111;
   --color-neutral-100: #F7F7F5;
+  --color-cream: #FBF8F1;
+  --color-cream-dark: #F2EDE1;
+  --color-ink: #1A1613;
 
   /* Form states */
   --color-success: #1B7F5F;
@@ -52,78 +172,49 @@
   --color-danger-800: #991B1B;
   --color-danger-900: #7F1D1D;
 
-  /* Fonts */
-  --font-display: "Inter Tight", "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
+  /* Fonts — Fraunces carries the food-editorial character, Inter the UI */
+  --font-display: Fraunces, Georgia, serif;
+  --font-body: Inter, system-ui, sans-serif;
 
-  /* Font sizes */
+  /* Modular type scale — every step distinct, nothing under 12px */
   --text-xs: 12px;
+  --text-xs--line-height: 18px;
   --text-sm: 14px;
+  --text-sm--line-height: 20px;
   --text-base: 16px;
-  --text-lg: 20px;
+  --text-base--line-height: 26px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
   --text-xl: 20px;
-  --text-2xl: 28px;
-  --text-3xl: 28px;
-  --text-4xl: 48px;
+  --text-xl--line-height: 30px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 38px;
+  --text-4xl: 38px;
+  --text-4xl--line-height: 44px;
   --text-5xl: 48px;
-
-  --max-width-prose: 48rem;
+  --text-5xl--line-height: 52px;
+  --text-6xl: 60px;
+  --text-6xl--line-height: 62px;
 
   --shadow-primary: 0 10px 15px -3px rgba(27, 94, 32, 0.1), 0 4px 6px -2px rgba(27, 94, 32, 0.05);
   --shadow-border: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
 }
 
-@plugin "@tailwindcss/typography";
-
 /* ── Base Layer ───────────────────────────────────────────────────────────── */
 @layer base {
-  :root {
-    --color-primary: #1B5E20;
-    --color-primary-50: #E8F5E9;
-    --color-primary-100: #C8E6C9;
-    --color-primary-600: #2E7D32;
-    --color-accent: #D4A017;
-    --color-accent-600: #B88914;
-    --color-amazon: #FF9900;
-    --color-amazon-dark: #e88900;
-    --color-neutral-900: #0F1111;
-    --color-neutral-100: #F7F7F5;
-    --color-success: #1B7F5F;
-    --color-warning: #D97706;
-    --color-danger: #B91C1C;
-
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 0.75rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-    --spacing-2xl: 3rem;
-
-    --radius-sm: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 0.75rem;
-
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    --shadow-primary: 0 10px 15px -3px rgba(27, 94, 32, 0.1), 0 4px 6px -2px rgba(27, 94, 32, 0.05);
-    --shadow-border: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
-  }
-
   html {
     scroll-behavior: smooth;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    line-height: 1.6;
-    color: var(--color-neutral-900);
-    background-color: var(--color-neutral-100);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    color: var(--color-ink);
+    background-color: var(--color-cream);
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
@@ -131,335 +222,238 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter Tight', 'Inter', sans-serif;
+    font-family: var(--font-display);
     font-weight: 600;
-    line-height: 1.2;
+    line-height: 1.15;
     color: var(--color-primary);
-    margin-bottom: 0.5em;
-    letter-spacing: -0.02em;
+    text-wrap: balance;
+    letter-spacing: -0.015em;
   }
 
   a {
     color: var(--color-primary);
     text-decoration: none;
-    transition: color 0.2s ease-in-out;
   }
 
-  a:hover {
-    color: var(--color-primary-600);
-  }
-
+  /* Visible focus on everything interactive, keyboard only. */
   :focus-visible {
-    outline: 2px solid var(--color-accent);
+    outline: 3px solid var(--color-accent);
     outline-offset: 2px;
-    border-radius: var(--radius-sm);
+    border-radius: 4px;
   }
 
   ::selection {
     background-color: var(--color-accent);
-    color: white;
-  }
-
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--color-neutral-100);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-primary);
-    border-radius: var(--radius-md);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary-600);
+    color: #fff;
   }
 
   img {
-    content-visibility: auto;
     max-width: 100%;
     height: auto;
   }
 }
 
-/* ── Components Layer ─────────────────────────────────────────────────────── */
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2;
-  }
+/* ── Components — plain CSS. Tailwind v4: never @apply on a custom class. ── */
 
-  .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-600 focus:ring-accent;
-  }
-
-  .btn-secondary {
-    @apply bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-accent;
-  }
-
-  .btn-ghost {
-    @apply text-primary hover:underline focus:ring-accent;
-  }
-
-  .btn-accent {
-    @apply bg-accent text-white hover:bg-accent-600 focus:ring-accent;
-  }
-
-  .btn-amazon {
-    @apply bg-amazon text-white hover:bg-amazon-dark focus:ring-accent;
-  }
-
-  .btn-sm {
-    @apply px-3 py-1.5 text-xs;
-  }
-
-  .btn-lg {
-    @apply px-6 py-3 text-base;
-  }
-
-  .btn-xl {
-    @apply px-8 py-4 text-lg;
-  }
-
-  .card {
-    @apply bg-white rounded-lg shadow-lg overflow-hidden;
-  }
-
-  .card-hover {
-    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
-  }
-
-  .card-body {
-    @apply p-6;
-  }
-
-  .card-header {
-    @apply p-6 pb-0;
-  }
-
-  .card-footer {
-    @apply p-6 pt-0;
-  }
-
-  .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-primary {
-    @apply bg-primary text-white;
-  }
-
-  .badge-accent {
-    @apply bg-accent text-white;
-  }
-
-  .badge-success {
-    @apply bg-success text-white;
-  }
-
-  .badge-warning {
-    @apply bg-warning text-white;
-  }
-
-  .badge-danger {
-    @apply bg-danger text-white;
-  }
-
-  .badge-neutral {
-    @apply bg-neutral-200 text-neutral-800;
-  }
-
-  .form-input {
-    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent;
-  }
-
-  .form-textarea {
-    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent;
-    resize: vertical;
-  }
-
-  .form-select {
-    @apply block w-full px-3 py-2 border border-neutral-300 rounded-lg shadow-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent pr-10 bg-white;
-  }
-
-  .form-checkbox {
-    @apply h-4 w-4 text-primary focus:ring-accent border-neutral-300 rounded;
-  }
-
-  .form-radio {
-    @apply h-4 w-4 text-primary focus:ring-accent border-neutral-300;
-  }
-
-  .form-label {
-    @apply block text-sm font-medium text-neutral-700 mb-1;
-  }
-
-  .form-error {
-    @apply text-sm text-danger mt-1;
-  }
-
-  .form-help {
-    @apply text-sm text-neutral-600 mt-1;
-  }
-
-  .loading {
-    @apply animate-pulse;
-  }
-
-  .loading-skeleton {
-    @apply bg-neutral-200 rounded-lg animate-pulse;
-  }
-
-  .spinner {
-    @apply animate-spin h-5 w-5 text-current;
-  }
-
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .content-auto {
-    content-visibility: auto;
-  }
-
-  .safe-area-inset-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-area-inset-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-
-  .safe-area-inset-left {
-    padding-left: env(safe-area-inset-left);
-  }
-
-  .safe-area-inset-right {
-    padding-right: env(safe-area-inset-right);
-  }
-
-  @media print {
-    .no-print {
-      display: none !important;
-    }
-
-    .print-only {
-      display: block !important;
-    }
-
-    body {
-      background: white !important;
-      color: black !important;
-    }
-
-    .card {
-      box-shadow: none !important;
-      border: 1px solid #ddd !important;
-    }
-  }
-
-  @media (prefers-contrast: high) {
-    .btn {
-      border: 2px solid currentColor;
-    }
-
-    .card {
-      border: 1px solid var(--color-neutral-900);
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    * {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
-
-    .scroll-smooth {
-      scroll-behavior: auto;
-    }
-  }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  /* 44px minimum hit area — WCAG target size, enforced on mobile too. */
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 9999px;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-/* ── Utilities Layer ─────────────────────────────────────────────────────── */
-@layer utilities {
-  .text-shadow {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 6px 18px -8px rgba(27, 94, 32, 0.6);
+}
+.btn-primary:hover { background-color: var(--color-primary-600); color: #fff; }
 
-  .text-shadow-lg {
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.6);
-  }
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  box-shadow: inset 0 0 0 2px var(--color-primary);
+}
+.btn-secondary:hover { background-color: var(--color-primary); color: #fff; }
 
-  .text-shadow-xl {
-    text-shadow: 0 6px 12px rgba(0, 0, 0, 0.5), 0 3px 6px rgba(0, 0, 0, 0.7);
-  }
+.btn-accent {
+  background-color: var(--color-accent);
+  color: #241a02;
+}
+.btn-accent:hover { background-color: var(--color-accent-400); color: #241a02; }
 
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+.btn-amazon {
+  background-color: var(--color-amazon);
+  color: #241a02;
+}
+.btn-amazon:hover { background-color: var(--color-amazon-dark); color: #241a02; }
 
-  .not-sr-only {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: 0;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
+.btn-lg {
+  padding: 0.9375rem 1.75rem;
+  font-size: var(--text-lg);
+  min-height: 52px;
+}
 
-  .prose-keto {
-    @apply prose prose-lg max-w-none prose-headings:font-display prose-headings:text-primary prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-p:text-neutral-700 prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-neutral-900 prose-li:text-neutral-700 prose-blockquote:border-primary prose-blockquote:bg-primary-50 prose-blockquote:rounded-lg prose-blockquote:p-4 prose-img:rounded-lg prose-img:shadow-lg;
-  }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-primary { background-color: var(--color-primary-50); color: var(--color-primary); }
+.badge-accent  { background-color: var(--color-accent-50); color: var(--color-accent-700); }
 
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-  }
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px rgba(15, 17, 17, 0.06), 0 12px 28px -18px rgba(15, 17, 17, 0.28);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.card:hover {
+  box-shadow: 0 2px 4px rgba(15, 17, 17, 0.07), 0 22px 44px -20px rgba(15, 17, 17, 0.35);
+  transform: translateY(-3px);
+}
+.card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1.25rem;
+}
+@media (min-width: 768px) {
+  .card-body { padding: 1.5rem; }
+}
 
-  .animate-slide-up {
-    animation: slideUp 0.3s ease-out;
-  }
+/* Photo frame: the LQIP sits behind the real image so there is never a blank box. */
+.photo-frame {
+  position: relative;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.photo-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-  .animate-bounce-in {
-    animation: bounceIn 0.6s ease-out;
-  }
+/* Editorial prose. `prose prose-lg` from the typography plugin supplies the
+   rhythm; these overrides supply the brand. */
+.prose-keto {
+  max-width: 68ch;
+  font-size: var(--text-lg);
+  line-height: 1.75;
+  color: #34302b;
+}
+.prose-keto :where(h2, h3, h4) { color: var(--color-primary); }
+.prose-keto :where(h2) { font-size: var(--text-3xl); margin-top: 2.5em; }
+.prose-keto :where(h3) { font-size: var(--text-2xl); margin-top: 2em; }
+.prose-keto :where(h4) { font-size: var(--text-xl); }
+.prose-keto :where(a) {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--color-accent-200);
+}
+.prose-keto :where(a):hover { text-decoration-color: var(--color-accent); }
+.prose-keto :where(strong) { color: var(--color-ink); font-weight: 600; }
+.prose-keto :where(blockquote) {
+  border-left: 4px solid var(--color-accent);
+  background-color: var(--color-accent-50);
+  border-radius: 0 0.75rem 0.75rem 0;
+  padding: 1rem 1.25rem;
+  font-style: normal;
+  font-family: var(--font-display);
+  color: var(--color-primary-700);
+}
+.prose-keto :where(blockquote p:first-of-type)::before,
+.prose-keto :where(blockquote p:last-of-type)::after { content: none; }
+.prose-keto :where(ul, ol) { padding-left: 1.5rem; }
+.prose-keto :where(li)::marker { color: var(--color-accent); }
+.prose-keto :where(table) {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  font-size: var(--text-base);
+}
+.prose-keto :where(thead) { background-color: var(--color-primary-50); }
+.prose-keto :where(th) { color: var(--color-primary); text-align: left; }
+.prose-keto :where(th, td) { padding: 0.625rem 0.875rem; border-bottom: 1px solid var(--color-cream-dark); }
+.prose-keto :where(img) { border-radius: 1rem; }
+.prose-keto :where(code) { color: var(--color-primary-700); }
+.prose-keto :where(.btn, .btn *) { text-decoration: none; }
+.prose-keto :where(.btn-primary) { color: #fff; }
 
-  .will-change-auto {
-    will-change: auto;
-  }
+/* Heading anchors from rehype-autolink-headings — visible on hover/focus only. */
+.anchor-link {
+  margin-left: 0.4em;
+  opacity: 0;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.anchor-link::after { content: '#'; color: var(--color-accent); }
+:where(h2, h3, h4):hover .anchor-link,
+.anchor-link:focus-visible { opacity: 1; }
 
-  .will-change-transform {
-    will-change: transform;
-  }
+/* ── Utilities ───────────────────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.not-sr-only {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
 
-  .will-change-opacity {
-    will-change: opacity;
-  }
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+}
 
-  .contain-layout {
-    contain: layout;
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-
-  .contain-paint {
-    contain: paint;
-  }
-
-  .contain-size {
-    contain: size;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
+  .card:hover { transform: none; }
 }

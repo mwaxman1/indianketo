@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Photo from "@/components/Photo.astro";
+import Icon from "@/components/Icon.astro";
 ---
 
 <BaseLayout
@@ -7,17 +9,56 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
   description="The page you're looking for doesn't exist. Browse our Indian keto articles and recipes instead."
   noindex={true}
 >
-  <section class="py-24">
-    <div class="max-w-xl mx-auto px-4 text-center">
-      <div class="text-8xl mb-6">🥘</div>
-      <h1 class="text-4xl font-display font-semibold text-primary mb-4">Page Not Found</h1>
-      <p class="text-lg text-neutral-600 mb-8">
-        The page you're looking for doesn't exist. But we have plenty of Indian keto content for you!
+  <section class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8">
+    <div>
+      <p class="badge badge-accent">Error 404</p>
+      <h1 class="mt-4 font-display text-4xl font-semibold leading-tight text-primary sm:text-5xl">
+        This dish isn't on the menu
+      </h1>
+      <p class="mt-5 max-w-lg text-lg leading-relaxed text-neutral-900/70">
+        The page you asked for doesn't exist — it may have moved, or the link may
+        be mistyped. Everything we've published is one click away.
       </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="/" class="btn btn-primary btn-lg">Go Home</a>
-        <a href="/articles" class="btn btn-secondary btn-lg">Browse Articles</a>
+
+      <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <a href="/" class="btn btn-primary btn-lg w-full sm:w-auto">
+          <Icon name="arrow-left" class="h-5 w-5" />
+          Back to home
+        </a>
+        <a href="/articles" class="btn btn-secondary btn-lg w-full sm:w-auto">
+          Browse articles
+          <Icon name="arrow-right" class="h-5 w-5" />
+        </a>
       </div>
+
+      <ul class="mt-10 flex flex-col gap-2 border-t border-cream-dark pt-6">
+        <li>
+          <a href="/articles/indian-keto-diet" class="flex min-h-[44px] items-center gap-2 text-base font-medium text-primary hover:underline">
+            <Icon name="book-open" class="h-5 w-5 text-accent" />
+            The complete Indian keto beginner's guide
+          </a>
+        </li>
+        <li>
+          <a href="/articles/indian-keto-meal-plan" class="flex min-h-[44px] items-center gap-2 text-base font-medium text-primary hover:underline">
+            <Icon name="clipboard-check" class="h-5 w-5 text-accent" />
+            The 7-day Indian keto meal plan
+          </a>
+        </li>
+        <li>
+          <a href="/roundups" class="flex min-h-[44px] items-center gap-2 text-base font-medium text-primary hover:underline">
+            <Icon name="spice-box" class="h-5 w-5 text-accent" />
+            Kit for an Indian keto kitchen
+          </a>
+        </li>
+      </ul>
     </div>
+
+    <Photo
+      slug="kofta-korma-bowl"
+      class="aspect-[4/3] w-full rounded-3xl lg:aspect-square"
+      widths={[480, 720, 960]}
+      sizes="(min-width: 1024px) 34rem, 100vw"
+      eager={true}
+    />
   </section>
 </BaseLayout>

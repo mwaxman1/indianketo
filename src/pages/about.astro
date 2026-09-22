@@ -1,28 +1,58 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Photo from "@/components/Photo.astro";
+import Icon from "@/components/Icon.astro";
 ---
 
 <BaseLayout
-  title="About Indian Keto — Our Mission & Team"
+  title="About Indian Keto — Our Mission & Approach"
   description="Learn about Indian Keto — our mission to make keto Indian food accessible, delicious, and practical for everyone."
 >
-  <section class="py-16">
-    <div class="max-w-3xl mx-auto px-4">
-      <h1 class="text-4xl font-display font-semibold text-primary mb-6">About Indian Keto</h1>
-      <div class="prose-keto">
-        <p>Indian Keto was founded in 2026 with a simple mission: to help people enjoy the rich, vibrant flavors of Indian cuisine while following a ketogenic diet.</p>
-        <p>We believe that going keto shouldn't mean giving up the foods you love. Indian cuisine is naturally rich in spices, healthy fats, and proteins — making it one of the best cuisines in the world to adapt for a low-carb lifestyle.</p>
-        <h2>What We Do</h2>
-        <p>We create in-depth guides, tested recipes, and curated product recommendations specifically for the Indian keto community. Every recipe we share has been tested to ensure it delivers authentic Indian flavor while keeping net carbs low.</p>
-        <h2>Our Approach</h2>
-        <ul>
-          <li><strong>Authentic flavors first</strong> — We never compromise on taste. Every recipe uses traditional Indian spices and techniques.</li>
-          <li><strong>Practical and accessible</strong> — Our recipes use ingredients you can find at regular grocery stores and Indian markets.</li>
-          <li><strong>Evidence-based</strong> — All nutritional information is calculated and verified. We don't make claims we can't back up.</li>
-        </ul>
-        <h2>Contact Us</h2>
-        <p>Have a question or suggestion? We'd love to hear from you. Reach out at <a href="mailto:hello@indianketo.com">hello@indianketo.com</a> or visit our <a href="/contact">contact page</a>.</p>
-      </div>
+  <section class="mx-auto grid max-w-7xl gap-10 px-4 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8">
+    <div>
+      <p class="badge badge-primary">About</p>
+      <h1 class="mt-4 font-display text-4xl font-semibold leading-tight text-primary sm:text-5xl">
+        Indian food is the easiest cuisine to take low-carb
+      </h1>
+      <p class="mt-5 text-lg leading-relaxed text-neutral-900/70">
+        Spices carry no carbohydrate. Ghee is already the traditional fat.
+        Paneer, eggs, mutton and greens are already in the repertoire. The carbs
+        sit in the rice, the roti and the sugar — three things you can move
+        without touching the flavour.
+      </p>
+    </div>
+    <Photo
+      slug="chicken-tikka-plate"
+      class="aspect-[4/3] w-full rounded-3xl"
+      widths={[480, 720, 960]}
+      sizes="(min-width: 1024px) 34rem, 100vw"
+      eager={true}
+    />
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div class="prose prose-lg prose-keto">
+      <p>Indian Keto was founded in 2026 to help people enjoy the rich, vibrant flavours of Indian cuisine while following a ketogenic diet. Going keto shouldn't mean eating like you left the country.</p>
+      <h2>What we do</h2>
+      <p>We publish in-depth guides, tested recipes and narrow product roundups for the Indian keto kitchen. Every recipe is cooked before it is published, and the net carb count is stated per dish rather than hidden in a daily total.</p>
+      <h2>Our approach</h2>
+      <ul>
+        <li><strong>Authentic flavours first</strong> — traditional spices and traditional technique. Tadka, bhuna and dum survive the swap; a sugar-laden gravy does not.</li>
+        <li><strong>Practical and accessible</strong> — ingredients you can buy at a regular supermarket or any Indian grocer, not mail-order novelties.</li>
+        <li><strong>Honest about the limits</strong> — we are not clinicians. Nothing here is medical advice, and we do not invent numbers to sound authoritative.</li>
+      </ul>
+      <h2>On the photography</h2>
+      <p>Every photograph on this site is licence-cleared, and every one is credited with its creator, licence and original source on our <a href="/disclosure#photo-credits">credits page</a>.</p>
+      <h2>Contact</h2>
+      <p>Questions or suggestions? Email <a href="mailto:hello@indianketo.com">hello@indianketo.com</a> or use the <a href="/contact">contact page</a>.</p>
+    </div>
+
+    <div class="mt-10 flex flex-col gap-3 sm:flex-row">
+      <a href="/articles" class="btn btn-primary w-full sm:w-auto">
+        Start with the guides
+        <Icon name="arrow-right" class="h-5 w-5" />
+      </a>
+      <a href="/contact" class="btn btn-secondary w-full sm:w-auto">Contact us</a>
     </div>
   </section>
 </BaseLayout>

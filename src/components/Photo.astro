@@ -1,0 +1,46 @@
+---
+// One way to put a photograph on the page: a real <Picture> (AVIF + WebP +
+// srcset, generated at build time) over its own LQIP, so the slot is never
+// blank and never a box.
+import { Picture } from 'astro:assets';
+import { photo, photos, type PhotoSlug } from '@/data/photos';
+
+export interface Props {
+  slug: PhotoSlug;
+  class?: string;
+  widths?: number[];
+  sizes?: string;
+  eager?: boolean;
+}
+
+const {
+  slug,
+  class: className = '',
+  widths = [400, 640, 960, 1280],
+  sizes = '100vw',
+  eager = false,
+} = Astro.props;
+
+// Fail the build on an unknown slug. A blank frame is the defect we are fixing.
+if (!(slug in photos)) {
+  throw new Error(`Photo slug "${slug}" is not in src/data/photos.ts`);
+}
+const p = photo(slug);
+---
+
+<div
+  class:list={['photo-frame', className]}
+  style={`background-image:url("${p.lqip}")`}
+>
+  <Picture
+    src={p.src}
+    alt={p.alt}
+    widths={widths}
+    sizes={sizes}
+    formats={['avif', 'webp']}
+    pictureAttributes={{ class: 'block h-full w-full' }}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding={eager ? 'sync' : 'async'}
+    fetchpriority={eager ? 'high' : 'auto'}
+  />
+</div>

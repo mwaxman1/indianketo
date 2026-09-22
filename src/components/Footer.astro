@@ -1,76 +1,93 @@
 ---
-import NewsletterSignup from "./NewsletterSignup.astro";
+import NewsletterSignup from "@/components/NewsletterSignup.astro";
+import Icon from "@/components/Icon.astro";
+import { photos } from "@/data/photos";
+
+const columns = [
+  {
+    heading: "Resources",
+    items: [
+      { href: "/articles", label: "Articles" },
+      { href: "/roundups", label: "Product Roundups" },
+    ],
+  },
+  {
+    heading: "Company",
+    items: [
+      { href: "/about", label: "About Us" },
+      { href: "/contact", label: "Contact" },
+      { href: "/disclosure", label: "Affiliate Disclosure" },
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
+    ],
+  },
+  {
+    heading: "Popular Topics",
+    items: [
+      { href: "/articles/indian-keto-diet", label: "Indian Keto Diet Guide" },
+      { href: "/articles/indian-keto-recipes", label: "Indian Keto Recipes" },
+      { href: "/articles/indian-keto-meal-plan", label: "Indian Keto Meal Plan" },
+      { href: "/articles/keto-paneer-recipes", label: "Keto Paneer Recipes" },
+    ],
+  },
+];
+
+const photoCount = Object.keys(photos).length;
 ---
 
-<footer class="bg-primary text-white">
-  <!-- Newsletter Section -->
-  <div class="bg-primary-600">
-    <div class="max-w-7xl mx-auto px-4 py-12">
-      <NewsletterSignup />
+<footer class="mt-auto bg-primary text-white">
+  <div class="bg-primary-800">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+      <NewsletterSignup referrer="footer" tone="dark" />
     </div>
   </div>
 
-  <!-- Main Footer Content -->
-  <div class="max-w-7xl mx-auto px-4 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <!-- Company Info -->
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
       <div>
-        <div class="flex items-center space-x-2 mb-4">
-          <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-          </div>
-          <span class="text-xl font-display font-semibold">Indian Keto</span>
+        <div class="flex items-center gap-2.5">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 text-accent-200">
+            <Icon name="leaf" class="h-5 w-5" />
+          </span>
+          <span class="font-display text-xl font-semibold">Indian Keto</span>
         </div>
-        <p class="text-primary-100 text-sm leading-relaxed mb-6">
-          Your trusted source for keto Indian food recipes, meal plans, and product recommendations. Making low-carb Indian cooking delicious and accessible.
+        <p class="mt-4 max-w-sm text-base leading-relaxed text-primary-100">
+          Keto Indian food without the compromise — tested recipes, honest kit
+          recommendations, and guides that respect the spice box.
         </p>
       </div>
 
-      <!-- Resources -->
-      <div>
-        <h3 class="font-semibold text-lg mb-4">Resources</h3>
-        <ul class="space-y-3 text-sm">
-          <li><a href="/articles" class="text-primary-100 hover:text-white transition-colors">Articles</a></li>
-          <li><a href="/roundups" class="text-primary-100 hover:text-white transition-colors">Product Roundups</a></li>
-        </ul>
-      </div>
-
-      <!-- Company -->
-      <div>
-        <h3 class="font-semibold text-lg mb-4">Company</h3>
-        <ul class="space-y-3 text-sm">
-          <li><a href="/about" class="text-primary-100 hover:text-white transition-colors">About Us</a></li>
-          <li><a href="/contact" class="text-primary-100 hover:text-white transition-colors">Contact</a></li>
-          <li><a href="/disclosure" class="text-primary-100 hover:text-white transition-colors">Affiliate Disclosure</a></li>
-          <li><a href="/privacy" class="text-primary-100 hover:text-white transition-colors">Privacy Policy</a></li>
-          <li><a href="/terms" class="text-primary-100 hover:text-white transition-colors">Terms of Service</a></li>
-        </ul>
-      </div>
-
-      <!-- Topics -->
-      <div>
-        <h3 class="font-semibold text-lg mb-4">Popular Topics</h3>
-        <ul class="space-y-3 text-sm">
-          <li><a href="/articles/indian-keto-diet" class="text-primary-100 hover:text-white transition-colors">Indian Keto Diet Guide</a></li>
-          <li><a href="/articles/indian-keto-recipes" class="text-primary-100 hover:text-white transition-colors">Indian Keto Recipes</a></li>
-          <li><a href="/articles/indian-keto-meal-plan" class="text-primary-100 hover:text-white transition-colors">Indian Keto Meal Plan</a></li>
-          <li><a href="/articles/keto-paneer-recipes" class="text-primary-100 hover:text-white transition-colors">Keto Paneer Recipes</a></li>
-        </ul>
-      </div>
+      {columns.map((col) => (
+        <nav aria-label={col.heading}>
+          <h2 class="font-display text-lg font-semibold text-white">{col.heading}</h2>
+          <ul class="mt-4 flex flex-col gap-1">
+            {col.items.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="flex min-h-[44px] items-center text-base text-primary-100 hover:text-white hover:underline"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))}
     </div>
 
-    <!-- Bottom Bar -->
-    <div class="mt-8 pt-8 border-t border-primary-600 flex flex-col md:flex-row justify-between items-center">
-      <p class="text-primary-100 text-sm">
-        &copy; 2026 Indian Keto. All rights reserved.
-      </p>
-      <div class="flex items-center space-x-6 mt-4 md:mt-0 text-sm">
-        <span class="text-primary-100">
-          Made for the keto community
+    <div class="mt-10 flex flex-col gap-4 border-t border-white/15 pt-8 text-base text-primary-100 md:flex-row md:items-center md:justify-between">
+      <p>&copy; 2026 Indian Keto. All rights reserved.</p>
+      <p class="flex items-center gap-2">
+        <Icon name="camera" class="h-5 w-5 shrink-0 text-accent-200" />
+        <span>
+          All {photoCount} photographs are licence-cleared —
+          <a
+            href="/disclosure"
+            class="inline-flex min-h-[44px] items-center font-semibold text-accent-200 underline decoration-accent-400 decoration-2 underline-offset-4 hover:text-white"
+          >photo credits &amp; licences</a>.
         </span>
-      </div>
+      </p>
     </div>
   </div>
 </footer>

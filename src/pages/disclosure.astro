@@ -1,27 +1,89 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Photo from "@/components/Photo.astro";
+import Icon from "@/components/Icon.astro";
+import { photos, type Photo as PhotoData, type PhotoSlug } from "@/data/photos";
+
+// Credits are read straight from the manifest — never hand-typed, so a new
+// photograph can never ship uncredited.
+const credits = Object.values(photos) as readonly PhotoData[];
+const licenceCount = new Set(credits.map((c) => c.license)).size;
 ---
 
 <BaseLayout
-  title="Affiliate Disclosure — Indian Keto"
-  description="Indian Keto participates in affiliate programs including Amazon Associates. Learn how we earn commissions and how it supports our work."
+  title="Affiliate Disclosure & Photo Credits — Indian Keto"
+  description="Indian Keto participates in the Amazon Associates programme. This page explains how we earn commissions and credits every photograph on the site with its creator, licence and source."
 >
-  <section class="py-16">
-    <div class="max-w-3xl mx-auto px-4">
-      <h1 class="text-4xl font-display font-semibold text-primary mb-6">Affiliate Disclosure</h1>
-      <div class="prose-keto">
-        <p>Indian Keto is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
-        <p>This means that when you click on certain links on our site and make a purchase, we may earn a small commission at no additional cost to you.</p>
-        <h2>Why We Use Affiliate Links</h2>
-        <p>Affiliate commissions help support the ongoing work of Indian Keto — recipe development, content creation, and site maintenance. We only recommend products we genuinely believe in and that we think will help you with your Indian keto cooking.</p>
-        <h2>Our Commitment</h2>
-        <ul>
-          <li>We never let affiliate relationships influence our recommendations.</li>
-          <li>We clearly mark all affiliate links.</li>
-          <li>We only recommend products we would use ourselves.</li>
-        </ul>
-        <p>If you have any questions about our affiliate relationships, please contact us at <a href="mailto:hello@indianketo.com">hello@indianketo.com</a>.</p>
+  <section class="mx-auto max-w-3xl px-4 pt-10 sm:px-6 sm:pt-14">
+    <p class="badge badge-primary">Transparency</p>
+    <h1 class="mt-4 font-display text-4xl font-semibold text-primary sm:text-5xl">
+      Disclosure &amp; credits
+    </h1>
+    <p class="mt-5 text-lg leading-relaxed text-neutral-900/70">
+      Two things you are entitled to know: how this site makes money, and where
+      its photographs came from.
+    </p>
+  </section>
+
+  <section class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <div class="prose prose-lg prose-keto">
+      <h2>Affiliate disclosure</h2>
+      <p>Indian Keto is a participant in the Amazon Services LLC Associates Program, an affiliate advertising program designed to provide a means for sites to earn advertising fees by advertising and linking to Amazon.com.</p>
+      <p>When you click certain links on this site and make a purchase, we may earn a small commission at no additional cost to you.</p>
+      <h3>Why we use affiliate links</h3>
+      <p>Affiliate commissions pay for recipe testing, photography licensing and site maintenance. We only recommend products we would put in our own kitchen.</p>
+      <h3>Our commitment</h3>
+      <ul>
+        <li>Affiliate relationships never influence a recommendation or a ranking.</li>
+        <li>Affiliate links are marked, and this disclosure appears on every page.</li>
+        <li>We do not accept payment for placement in a roundup.</li>
+      </ul>
+      <p>Questions about any of this? Email <a href="mailto:hello@indianketo.com">hello@indianketo.com</a>.</p>
+    </div>
+  </section>
+
+  <!-- ── Photo credits, generated from src/data/photos.ts ─────────────────── -->
+  <section id="photo-credits" class="border-t border-cream-dark bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <div class="max-w-2xl">
+        <p class="inline-flex items-center gap-2 rounded-full bg-accent-50 px-4 py-2 text-sm font-semibold uppercase tracking-wide text-accent-700">
+          <Icon name="camera" class="h-4 w-4" />
+          Photo credits
+        </p>
+        <h2 class="mt-5 font-display text-3xl font-semibold text-primary sm:text-4xl">
+          Every photograph on this site, credited
+        </h2>
+        <p class="mt-4 text-lg text-neutral-900/70">
+          {credits.length} photographs across {licenceCount} licence types. Each
+          entry links to the original so you can verify the licence yourself.
+        </p>
       </div>
+
+      <ul class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {credits.map((c) => (
+          <li class="flex gap-4 rounded-2xl border border-cream-dark bg-cream p-4">
+            <Photo
+              slug={c.slug as PhotoSlug}
+              class="h-20 w-20 shrink-0 rounded-xl"
+              widths={[160, 240]}
+              sizes="80px"
+            />
+            <div class="min-w-0">
+              <p class="font-display text-base font-semibold leading-snug text-primary">{c.title}</p>
+              <p class="mt-1 text-sm text-neutral-900/70">{c.creator}</p>
+              <p class="mt-1 text-sm font-semibold uppercase tracking-wide text-accent-700">{c.license}</p>
+              <a
+                href={c.sourceUrl}
+                rel="nofollow noopener"
+                class="mt-2 inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold text-primary-600 underline decoration-accent-300 decoration-2 underline-offset-4 hover:text-primary"
+              >
+                View source
+                <Icon name="arrow-right" class="h-4 w-4" />
+              </a>
+            </div>
+          </li>
+        ))}
+      </ul>
     </div>
   </section>
 </BaseLayout>
