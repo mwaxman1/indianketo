@@ -1,0 +1,50 @@
+---
+// Article / roundup card: photograph on top, editorial meta below.
+import Photo from '@/components/Photo.astro';
+import Icon from '@/components/Icon.astro';
+import type { PhotoSlug } from '@/data/photos';
+
+export interface Props {
+  href: string;
+  title: string;
+  description: string;
+  date: string;
+  photoSlug: PhotoSlug;
+  kind: 'Article' | 'Product Roundup';
+  cta?: string;
+  sizes?: string;
+}
+
+const {
+  href,
+  title,
+  description,
+  date,
+  photoSlug,
+  kind,
+  cta = kind === 'Article' ? 'Read article' : 'View roundup',
+  sizes = '(min-width: 1024px) 24rem, (min-width: 640px) 50vw, 100vw',
+} = Astro.props;
+
+const dateLabel = new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<a href={href} class="card group focus-visible:outline-3 focus-visible:outline-accent focus-visible:outline-offset-2">
+  <Photo slug={photoSlug} class="aspect-[4/3] w-full" sizes={sizes} />
+  <div class="card-body">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span class:list={['badge', kind === 'Article' ? 'badge-primary' : 'badge-accent']}>{kind}</span>
+      <time datetime={date} class="text-sm text-neutral-900/55">{dateLabel}</time>
+    </div>
+    <h3 class="font-display text-xl font-semibold text-primary group-hover:text-primary-600">{title}</h3>
+    <p class="text-base text-neutral-900/70">{description}</p>
+    <span class="mt-auto inline-flex items-center gap-2 pt-2 text-base font-semibold text-accent-700">
+      {cta}
+      <Icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
+    </span>
+  </div>
+</a>

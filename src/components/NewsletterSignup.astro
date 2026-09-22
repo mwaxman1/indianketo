@@ -1,42 +1,92 @@
 ---
-// Newsletter signup form — direct Sequenzy POST
+// Newsletter signup — direct Sequenzy POST.
+// The form contract is fixed: POST https://api.sequenzy.com/api/v1/forms/s3ean6yt56t58wha6iklj9uo
+// urlencoded, fields `email` + `referrer`. Styling only above the script.
+import Icon from "@/components/Icon.astro";
+
+export interface Props {
+  referrer?: string;
+  tone?: "dark" | "light";
+  heading?: string;
+  blurb?: string;
+}
+
+const {
+  referrer = "footer",
+  tone = "dark",
+  heading = "Get free Indian keto recipes weekly",
+  blurb = "One email a week: a tested recipe, a shopping tip, and the odd product we actually use. No spam, unsubscribe anytime.",
+} = Astro.props;
+
+const dark = tone === "dark";
 ---
 
-<div class="text-center">
-  <h2 class="text-2xl font-display font-semibold text-white mb-3">Get Free Indian Keto Recipes Weekly</h2>
-  <p class="text-primary-100 mb-6 max-w-xl mx-auto">Join our newsletter for weekly Indian keto recipes, meal plans, and product recommendations delivered to your inbox.</p>
-  <form class="kc-email-capture flex flex-col sm:flex-row gap-3 max-w-md mx-auto" data-status="idle">
+<div class="mx-auto max-w-2xl text-center">
+  <span
+    class:list={[
+      "inline-flex h-12 w-12 items-center justify-center rounded-2xl",
+      dark ? "bg-white/10 text-accent-200" : "bg-accent-50 text-accent-700",
+    ]}
+  >
+    <Icon name="envelope" class="h-6 w-6" />
+  </span>
+  <h2
+    class:list={[
+      "mt-4 font-display text-2xl font-semibold sm:text-3xl",
+      dark ? "text-white" : "text-primary",
+    ]}
+  >
+    {heading}
+  </h2>
+  <p class:list={["mt-3 text-base sm:text-lg", dark ? "text-primary-100" : "text-neutral-900/70"]}>
+    {blurb}
+  </p>
+
+  <form class="kc-email-capture mt-6 flex flex-col gap-3 sm:flex-row" data-status="idle">
+    <label class="sr-only" for={`kc-email-${referrer}`}>Email address</label>
     <input
+      id={`kc-email-${referrer}`}
       type="email"
       name="email"
-      placeholder="Your email address"
+      placeholder="you@example.com"
+      autocomplete="email"
       required
-      class="flex-1 px-4 py-3 rounded-lg text-neutral-900 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-accent"
+      class:list={[
+        "min-h-[52px] w-full flex-1 rounded-full border px-5 text-base text-neutral-900 placeholder-neutral-900/45",
+        dark ? "border-transparent bg-white" : "border-cream-dark bg-white",
+      ]}
     />
-    <input type="hidden" name="referrer" value="footer" />
-    <button
-      type="submit"
-      class="bg-accent hover:bg-accent-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors whitespace-nowrap"
-    >
+    <input type="hidden" name="referrer" value={referrer} />
+    <button type="submit" class="btn btn-accent btn-lg w-full sm:w-auto">
       Subscribe
+      <Icon name="arrow-right" class="h-5 w-5" />
     </button>
   </form>
-  <p class="kc-email-note text-primary-100 text-xs mt-3"></p>
-  <p class="text-primary-200 text-xs mt-2">No spam. Unsubscribe anytime.</p>
+
+  <p
+    class:list={[
+      "kc-email-note mt-3 min-h-[1.5rem] text-base font-medium",
+      dark ? "text-accent-200" : "text-primary-600",
+    ]}
+    role="status"
+    aria-live="polite"
+  ></p>
 </div>
 
-<script is:inline>
+<script>
+  // Delegated once per page: Astro bundles this component script a single time
+  // even when the component renders twice.
   document.addEventListener('submit', async (e) => {
     const form = e.target;
     if (!(form instanceof HTMLFormElement) || !form.classList.contains('kc-email-capture')) return;
     e.preventDefault();
-    const note = form.querySelector('.kc-email-note');
+    const note = form.parentElement?.querySelector('.kc-email-note');
     const btn = form.querySelector('button[type="submit"]');
     const data = new FormData(form);
     const email = String(data.get('email') ?? '').trim();
     if (!email) return;
     form.setAttribute('data-status', 'loading');
-    if (btn) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
+    if (btn instanceof HTMLButtonElement) { btn.disabled = true; btn.textContent = 'Subscribing…'; }
     try {
       // Direct Sequenzy form POST (no intermediary endpoint)
       const res = await fetch('https://api.sequenzy.com/api/v1/forms/s3ean6yt56t58wha6iklj9uo', {
@@ -48,18 +98,18 @@
       if (res.ok && json.success !== false) {
         form.setAttribute('data-status', 'success');
         if (note) note.textContent = json.message || 'Subscribed! Check your inbox to confirm.';
-        if (btn) btn.textContent = 'Subscribed ✓';
+        if (btn instanceof HTMLButtonElement) btn.textContent = 'Subscribed';
         const input = form.querySelector('input[type="email"]');
-        if (input) input.value = '';
+        if (input instanceof HTMLInputElement) input.value = '';
       } else {
         form.setAttribute('data-status', 'error');
         if (note) note.textContent = json.message || 'Something went wrong. Please try again.';
-        if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+        if (btn instanceof HTMLButtonElement) { btn.disabled = false; btn.textContent = 'Subscribe'; }
       }
     } catch {
       form.setAttribute('data-status', 'error');
       if (note) note.textContent = 'Network error. Please try again.';
-      if (btn) { btn.disabled = false; btn.textContent = 'Subscribe'; }
+      if (btn instanceof HTMLButtonElement) { btn.disabled = false; btn.textContent = 'Subscribe'; }
     }
   });
 </script>

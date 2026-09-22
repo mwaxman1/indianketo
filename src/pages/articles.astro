@@ -1,51 +1,72 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import PostCard from "@/components/PostCard.astro";
+import Photo from "@/components/Photo.astro";
+import Icon from "@/components/Icon.astro";
+import { getCollection } from "astro:content";
+import type { PhotoSlug } from "@/data/photos";
 
-const articles = [
-  { slug: "indian-keto-diet", title: "Indian Keto Diet: The Complete Beginner's Guide", description: "What to eat, what to avoid, and how to get started with Indian keto.", date: "2026-08-10" },
-  { slug: "indian-keto-recipes", title: "25+ Indian Keto Recipes That Taste Authentic", description: "A curated collection of keto-friendly Indian recipes from butter chicken to cauliflower rice biryani — all under 10g net carbs.", date: "2026-08-09" },
-  { slug: "indian-keto-meal-plan", title: "7-Day Indian Keto Meal Plan with Shopping List", description: "A complete week of Indian keto breakfast, lunch, and dinner with a printable shopping list. No guesswork required.", date: "2026-08-08" },
-  { slug: "keto-paneer-recipes", title: "10+ Keto Paneer Recipes Under 5g Net Carbs", description: "Paneer is a keto staple for good reason. These Indian paneer dishes keep you in ketosis.", date: "2026-08-07" },
-  { slug: "keto-cauliflower-rice-indian", title: "Keto Cauliflower Rice: Indian-Style Recipes & Tips", description: "How to make cauliflower rice for Indian cooking — biryani, pulao, fried rice, and more. Tips for perfect texture every time.", date: "2026-08-06" },
-  { slug: "indian-keto-snacks", title: "15 Indian Keto Snacks for When Hunger Strikes", description: "Quick and easy Indian keto snacks from masala nuts to paneer tikka. All ready in under 15 minutes.", date: "2026-08-05" },
-  { slug: "indian-keto-breakfast", title: "Indian Keto Breakfast: 12 Recipes to Start Your Day", description: "From keto-friendly dosa to egg bhurji, these Indian keto breakfasts keep you full until lunch.", date: "2026-08-04" },
-  { slug: "keto-roti-alternatives", title: "Keto Roti Alternatives: 6 Low-Carb Indian Breads", description: "Missing roti on keto? These almond flour, coconut flour, and psyllium husk flatbreads satisfy the craving.", date: "2026-08-03" },
-];
+const articles = (await getCollection("articles")).sort((a, b) =>
+  b.data.publishDate.localeCompare(a.data.publishDate),
+);
+const [lead, ...rest] = articles;
 ---
 
 <BaseLayout
   title="Indian Keto Articles — Guides, Recipes & Meal Plans"
   description="Browse our complete library of Indian keto articles. Expert guides on keto Indian food, recipes, meal plans, and low-carb Indian cooking tips."
 >
-  <section class="py-16">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="text-center mb-12">
-        <h1 class="text-4xl font-display font-semibold text-primary mb-4">Indian Keto Articles</h1>
-        <p class="text-lg text-neutral-600 max-w-2xl mx-auto">
-          Expert guides, recipes, and meal plans for following a keto diet with Indian food
-        </p>
-      </div>
+  <section class="mx-auto max-w-7xl px-4 pt-10 sm:px-6 sm:pt-14 lg:px-8">
+    <p class="badge badge-primary">Articles</p>
+    <h1 class="mt-4 max-w-3xl font-display text-4xl font-semibold text-primary sm:text-5xl">
+      Indian keto guides
+    </h1>
+    <p class="mt-4 max-w-2xl text-lg text-neutral-900/70">
+      {articles.length} long-form guides on eating keto with Indian food —
+      technique first, macros stated, nothing padded out to hit a word count.
+    </p>
+  </section>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {articles.map((article) => (
-          <a href={`/articles/${article.slug}`} class="card card-hover">
-            <div class="card-body">
-              <div class="flex items-center gap-2 mb-3">
-                <span class="badge badge-primary">Article</span>
-                <time class="text-sm text-neutral-500">{new Date(article.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
-              </div>
-              <h2 class="text-xl font-semibold text-primary mb-2">{article.title}</h2>
-              <p class="text-neutral-600 text-sm">{article.description}</p>
-              <div class="mt-4 flex items-center text-accent font-medium text-sm">
-                <span>Read Article</span>
-                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </div>
-          </a>
-        ))}
+  <!-- Lead story gets the big treatment; the rest run as a card grid. -->
+  <section class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <a
+      href={`/articles/${lead.id}`}
+      class="card group grid gap-0 lg:grid-cols-2 lg:items-stretch"
+    >
+      <Photo
+        slug={lead.data.image as PhotoSlug}
+        class="aspect-[16/9] w-full lg:aspect-auto lg:h-full"
+        widths={[480, 768, 1024, 1280]}
+        sizes="(min-width: 1024px) 38rem, 100vw"
+      />
+      <div class="card-body sm:p-8 lg:justify-center lg:p-10">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span class="badge badge-accent">Latest</span>
+          <time datetime={lead.data.publishDate} class="text-sm text-neutral-900/55">
+            {new Date(lead.data.publishDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          </time>
+        </div>
+        <h2 class="font-display text-2xl font-semibold text-primary sm:text-3xl">{lead.data.title}</h2>
+        <p class="text-base text-neutral-900/70 sm:text-lg">{lead.data.description}</p>
+        <span class="mt-2 inline-flex items-center gap-2 text-base font-semibold text-accent-700">
+          Read article
+          <Icon name="arrow-right" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
+        </span>
       </div>
+    </a>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 sm:mt-8 sm:grid-cols-2 lg:grid-cols-3">
+      {rest.map((a) => (
+        <PostCard
+          href={`/articles/${a.id}`}
+          title={a.data.title}
+          description={a.data.description}
+          date={a.data.publishDate}
+          photoSlug={a.data.image as PhotoSlug}
+          kind="Article"
+          sizes="(min-width: 1024px) 22rem, (min-width: 640px) 50vw, 100vw"
+        />
+      ))}
     </div>
   </section>
 </BaseLayout>

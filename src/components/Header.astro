@@ -1,51 +1,93 @@
 ---
-// Header component for Indian Keto
+import Icon from "@/components/Icon.astro";
+
+const links = [
+  { href: "/articles", label: "Articles" },
+  { href: "/roundups", label: "Product Roundups" },
+  { href: "/about", label: "About" },
+];
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(href + "/");
 ---
 
-<header class="bg-white shadow-sm sticky top-0 z-30">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
-      <!-- Logo -->
-      <a href="/" class="flex items-center space-x-2">
-        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-          </svg>
-        </div>
-        <span class="text-xl font-display font-semibold text-primary">Indian Keto</span>
+<header class="sticky top-0 z-30 border-b border-cream-dark bg-cream/95 backdrop-blur">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-16 items-center justify-between gap-4 md:h-20">
+      <a href="/" class="flex min-h-[44px] items-center gap-2.5" aria-label="Indian Keto — home">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-accent-200">
+          <Icon name="leaf" class="h-5 w-5" />
+        </span>
+        <span class="font-display text-xl font-semibold leading-none text-primary sm:text-2xl">Indian&nbsp;Keto</span>
       </a>
 
-      <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center space-x-8">
-        <a href="/articles" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">Articles</a>
-        <a href="/roundups" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">Product Roundups</a>
-        <a href="/about" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">About</a>
+      <nav class="hidden items-center gap-1 md:flex" aria-label="Main">
+        {links.map((l) => (
+          <a
+            href={l.href}
+            aria-current={isCurrent(l.href) ? "page" : undefined}
+            class:list={[
+              "inline-flex min-h-[44px] items-center rounded-full px-4 text-base font-medium transition-colors",
+              isCurrent(l.href)
+                ? "bg-primary-50 text-primary"
+                : "text-neutral-900/75 hover:bg-primary-50 hover:text-primary",
+            ]}
+          >
+            {l.label}
+          </a>
+        ))}
+        <a href="/articles" class="btn btn-primary ml-2">Start here</a>
       </nav>
 
-      <!-- Mobile menu button -->
-      <button id="mobile-menu-btn" class="md:hidden text-neutral-700 hover:text-primary" aria-label="Open menu">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+      <button
+        id="mobile-menu-btn"
+        type="button"
+        class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-primary hover:bg-primary-50 md:hidden"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <Icon name="menu" class="h-6 w-6" data-icon="open" />
+        <Icon name="close" class="hidden h-6 w-6" data-icon="close" />
       </button>
     </div>
 
-    <!-- Mobile Nav (hidden by default) -->
-    <div id="mobile-menu" class="hidden md:hidden pb-4">
-      <nav class="flex flex-col space-y-3">
-        <a href="/articles" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">Articles</a>
-        <a href="/roundups" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">Product Roundups</a>
-        <a href="/about" class="text-neutral-700 hover:text-primary font-medium text-sm transition-colors">About</a>
+    <div id="mobile-menu" class="hidden pb-4 md:hidden">
+      <nav class="flex flex-col gap-2" aria-label="Mobile">
+        {links.map((l) => (
+          <a
+            href={l.href}
+            aria-current={isCurrent(l.href) ? "page" : undefined}
+            class:list={[
+              "flex min-h-[52px] w-full items-center justify-between rounded-xl border px-4 text-lg font-medium",
+              isCurrent(l.href)
+                ? "border-primary bg-primary-50 text-primary"
+                : "border-cream-dark bg-white text-neutral-900/80",
+            ]}
+          >
+            {l.label}
+            <Icon name="chevron-right" class="h-5 w-5 text-accent" />
+          </a>
+        ))}
+        <a href="/articles" class="btn btn-primary btn-lg w-full">Start here</a>
       </nav>
     </div>
   </div>
 </header>
 
 <script is:inline>
-  document.getElementById('mobile-menu-btn')?.addEventListener('click', function() {
+  (function () {
+    var btn = document.getElementById('mobile-menu-btn');
     var menu = document.getElementById('mobile-menu');
-    if (menu) {
-      menu.classList.toggle('hidden');
-    }
-  });
+    if (!btn || !menu) return;
+    btn.addEventListener('click', function () {
+      var open = menu.classList.toggle('hidden') === false;
+      btn.setAttribute('aria-expanded', String(open));
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      var o = btn.querySelector('[data-icon="open"]');
+      var c = btn.querySelector('[data-icon="close"]');
+      if (o) o.classList.toggle('hidden', open);
+      if (c) c.classList.toggle('hidden', !open);
+    });
+  })();
 </script>

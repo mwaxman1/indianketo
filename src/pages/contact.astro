@@ -1,26 +1,70 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Icon from "@/components/Icon.astro";
+import Photo from "@/components/Photo.astro";
 ---
 
 <BaseLayout
   title="Contact Indian Keto — Get in Touch"
   description="Contact the Indian Keto team. We'd love to hear your questions, suggestions, and feedback about keto Indian food."
 >
-  <section class="py-16">
-    <div class="max-w-3xl mx-auto px-4">
-      <h1 class="text-4xl font-display font-semibold text-primary mb-6">Contact Us</h1>
-      <div class="prose-keto">
-        <p>We'd love to hear from you! Whether you have a question about Indian keto cooking, a recipe suggestion, or just want to say hello — we're here.</p>
-        <h2>Email</h2>
-        <p>Reach us at <a href="mailto:hello@indianketo.com">hello@indianketo.com</a>. We typically respond within 24-48 hours.</p>
-        <h2>Social Media</h2>
-        <p>Follow us for daily Indian keto tips, recipes, and inspiration:</p>
-        <ul>
-          <li>Twitter/X: <a href="https://twitter.com/indianketo">@indianketo</a></li>
-        </ul>
-        <h2>Collaborations</h2>
-        <p>Interested in partnering with Indian Keto? We're open to collaborations with brands, recipe developers, and fellow keto content creators. Email us with your proposal.</p>
-      </div>
+  <section class="mx-auto grid max-w-7xl gap-10 px-4 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-2 lg:items-center lg:gap-16 lg:px-8">
+    <div>
+      <p class="badge badge-primary">Contact</p>
+      <h1 class="mt-4 font-display text-4xl font-semibold leading-tight text-primary sm:text-5xl">
+        Talk to us
+      </h1>
+      <p class="mt-5 text-lg leading-relaxed text-neutral-900/70">
+        Recipe not working? Spotted an error in a carb count? Want to pitch a
+        collaboration? All of it lands in the same inbox and gets read.
+      </p>
+
+      <ul class="mt-8 flex flex-col gap-4">
+        <li class="flex items-start gap-4 rounded-2xl border border-cream-dark bg-white p-4">
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-accent-200">
+            <Icon name="envelope" class="h-5 w-5" />
+          </span>
+          <div>
+            <p class="font-display text-lg font-semibold text-primary">Email</p>
+            <a href="mailto:hello@indianketo.com" class="inline-flex min-h-[44px] items-center text-base font-medium text-primary-600 underline decoration-accent-300 decoration-2 underline-offset-4">hello@indianketo.com</a>
+            <p class="text-base text-neutral-900/65">We usually reply within two working days.</p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 rounded-2xl border border-cream-dark bg-white p-4">
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-accent-200">
+            <Icon name="sparkles" class="h-5 w-5" />
+          </span>
+          <div>
+            <p class="font-display text-lg font-semibold text-primary">Collaborations</p>
+            <p class="text-base text-neutral-900/65">
+              Brands, recipe developers and photographers: send the proposal to
+              the same address with “collab” in the subject line.
+            </p>
+          </div>
+        </li>
+        <li class="flex items-start gap-4 rounded-2xl border border-cream-dark bg-white p-4">
+          <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-accent-200">
+            <Icon name="shield-check" class="h-5 w-5" />
+          </span>
+          <div>
+            <p class="font-display text-lg font-semibold text-primary">Corrections</p>
+            <p class="text-base text-neutral-900/65">
+              If a number on this site is wrong, tell us and we will fix the page
+              and note the change.
+            </p>
+          </div>
+        </li>
+      </ul>
     </div>
+
+    <Photo
+      slug="egg-curry-anda"
+      class="aspect-[4/3] w-full rounded-3xl lg:aspect-square"
+      widths={[480, 720, 960]}
+      sizes="(min-width: 1024px) 34rem, 100vw"
+      eager={true}
+    />
   </section>
+
+  <div class="py-14"></div>
 </BaseLayout>
