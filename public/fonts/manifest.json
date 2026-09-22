@@ -1,0 +1,100 @@
+[
+ {
+  "family": "Fraunces",
+  "subset": "latin-ext",
+  "weight": "400",
+  "file": "fraunces-latin-ext-400.woff2",
+  "bytes": 59388
+ },
+ {
+  "family": "Fraunces",
+  "subset": "latin",
+  "weight": "400",
+  "file": "fraunces-latin-400.woff2",
+  "bytes": 67304
+ },
+ {
+  "family": "Fraunces",
+  "subset": "latin-ext",
+  "weight": "600",
+  "file": "fraunces-latin-ext-600.woff2",
+  "bytes": 59388
+ },
+ {
+  "family": "Fraunces",
+  "subset": "latin",
+  "weight": "600",
+  "file": "fraunces-latin-600.woff2",
+  "bytes": 67304
+ },
+ {
+  "family": "Fraunces",
+  "subset": "latin-ext",
+  "weight": "700",
+  "file": "fraunces-latin-ext-700.woff2",
+  "bytes": 59388
+ },
+ {
+  "family": "Fraunces",
+  "subset": "latin",
+  "weight": "700",
+  "file": "fraunces-latin-700.woff2",
+  "bytes": 67304
+ },
+ {
+  "family": "Inter",
+  "subset": "latin-ext",
+  "weight": "400",
+  "file": "inter-latin-ext-400.woff2",
+  "bytes": 85068
+ },
+ {
+  "family": "Inter",
+  "subset": "latin",
+  "weight": "400",
+  "file": "inter-latin-400.woff2",
+  "bytes": 48256
+ },
+ {
+  "family": "Inter",
+  "subset": "latin-ext",
+  "weight": "500",
+  "file": "inter-latin-ext-500.woff2",
+  "bytes": 85068
+ },
+ {
+  "family": "Inter",
+  "subset": "latin",
+  "weight": "500",
+  "file": "inter-latin-500.woff2",
+  "bytes": 48256
+ },
+ {
+  "family": "Inter",
+  "subset": "latin-ext",
+  "weight": "600",
+  "file": "inter-latin-ext-600.woff2",
+  "bytes": 85068
+ },
+ {
+  "family": "Inter",
+  "subset": "latin",
+  "weight": "600",
+  "file": "inter-latin-600.woff2",
+  "bytes": 48256
+ },
+ {
+  "family": "Inter",
+  "subset": "latin-ext",
+  "weight": "700",
+  "file": "inter-latin-ext-700.woff2",
+  "bytes": 85068
+ },
+ {
+  "family": "Inter",
+  "subset": "latin",
+  "weight": "700",
+  "file": "inter-latin-700.woff2",
+  "bytes": 48256
+ }
+]
