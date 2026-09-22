@@ -96,10 +96,10 @@ export const photos = {
     slug: 'lamb-korma-bowl',
     src: lamb_korma_bowl,
     alt: "Lamb korma in a scalloped porcelain bowl with a golden cashew gravy",
-    title: "Mutton curry ,Kolkata - West Bengal - DSC 0051",
+    title: "Mutton Rogan Josh curry",
     license: "by-sa 4.0",
-    creator: "TAPAS KUMAR HALDER",
-    sourceUrl: "https://commons.wikimedia.org/w/index.php?curid=126081655",
+    creator: "Kajori.p",
+    sourceUrl: "https://commons.wikimedia.org/w/index.php?curid=40984113",
     lqip: "data:image/webp;base64,UklGRloAAABXRUJQVlA4IE4AAAAwAgCdASoQAAwAA4BaJbACdADREvvMvkg8wAD+6E8KsMpC6p8f/0dco9XZi6Ab2LvBz5e3wxctj7P0WrrsYurHyW9ZOHIBJK9QLBAAAAA=",
   },
   'mutton-curry-bowl': {
