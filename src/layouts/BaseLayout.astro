@@ -39,6 +39,11 @@ const ogImage = new URL(image, Astro.site).href;
 
     <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
 
+    <!-- Vercel Web Analytics: first-party, cookieless; script is served by the
+         Vercel platform at /_vercel/insights/script.js, not by the build output,
+         so it must stay is:inline and is never bundled or rewritten. -->
+    <script is:inline defer src="/_vercel/insights/script.js"></script>
+
     <!-- Self-hosted fonts. @font-face lives in global.css; these are the three
          faces used above the fold, so they are fetched with the stylesheet. -->
     <link rel="preload" href="/fonts/inter-latin-400.woff2" as="font" type="font/woff2" crossorigin />
