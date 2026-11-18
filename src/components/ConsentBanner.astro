@@ -1,0 +1,42 @@
+---
+// ConsentBanner.astro — the analytics opt-out banner.
+// Copied from the fleet standard: mwaxman1/site-factory app/src/components/ConsentBanner.astro (aed7991).
+// Same markup contract (id, hidden, aria-label, data-consent buttons), same
+// localStorage key and the same window.grantAnalyticsConsent /
+// window.denyAnalyticsConsent hooks that AnalyticsHead.astro installs.
+// Styling is inline (this site does not share the fleet's Tailwind tokens).
+// Do NOT put a `display` style on the aside itself: the `hidden` attribute has
+// to win until the script below un-hides it.
+---
+<aside id="analytics-consent" hidden aria-label="Analytics choice" style="margin:0 auto;width:100%;max-width:36rem;padding:1.5rem 1rem 0;box-sizing:border-box;">
+  <div style="border:1px solid rgba(0,0,0,0.12);border-radius:0.75rem;background:#fff;color:#1f2937;padding:1.25rem;box-shadow:0 10px 25px rgba(0,0,0,0.12);font-size:0.875rem;line-height:1.5;">
+    <p style="margin:0;">We use Google Analytics to count visits and see which pages help people. It is on unless you turn it off, and the site works the same either way. See our <a href="/privacy" style="text-decoration:underline;color:inherit;">privacy policy</a> for the other tools we use.</p>
+    <div style="margin-top:1rem;display:flex;flex-wrap:wrap;gap:0.75rem;">
+      <button type="button" data-consent="accepted" style="cursor:pointer;border:1px solid #111827;background:#111827;color:#fff;border-radius:0.5rem;padding:0.5rem 1rem;font:inherit;">Keep analytics on</button>
+      <button type="button" data-consent="declined" style="cursor:pointer;border:1px solid #6b7280;background:transparent;color:#111827;border-radius:0.5rem;padding:0.5rem 1rem;font:inherit;">Turn analytics off</button>
+    </div>
+  </div>
+</aside>
+<script is:inline>
+  (() => {
+    const banner = document.getElementById('analytics-consent');
+    if (!banner) return;
+    const key = 'rr-analytics-consent';
+    let choice = null;
+    try { choice = localStorage.getItem(key); } catch (_) { /* Default to no consent. */ }
+    banner.hidden = choice === 'accepted' || choice === 'declined';
+    banner.querySelectorAll('[data-consent]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const accepted = button.dataset.consent === 'accepted';
+        try { localStorage.setItem(key, accepted ? 'accepted' : 'declined'); } catch (_) { /* Choice still applies to this page. */ }
+        if (accepted) window.grantAnalyticsConsent?.();
+        else window.denyAnalyticsConsent?.();
+        banner.hidden = true;
+      });
+    });
+    document.getElementById('manage-analytics-consent')?.addEventListener('click', () => {
+      banner.hidden = false;
+      banner.querySelector('button')?.focus();
+    });
+  })();
+</script>

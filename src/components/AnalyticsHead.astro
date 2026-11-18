@@ -1,0 +1,234 @@
+---
+// AnalyticsHead.astro — GA4 + Microsoft Clarity + the Meta pixel.
+// Copied from the fleet standard: mwaxman1/site-factory app/src/components/AnalyticsHead.astro (aed7991).
+// Keep behaviour in sync with that file; do not fork the consent logic.
+//
+// Props:
+//   measurementId  GA4 "G-XXXX" measurement ID (empty = not provisioned)
+//   clarityId      Microsoft Clarity project ID (empty = not provisioned)
+//   pixelId        Meta pixel ID (empty = not provisioned)
+//
+// Renders nothing when every ID is empty, so unprovisioned sites build and
+// serve with zero analytics overhead. All config scripts use `is:inline` so
+// Astro does not bundle/tree-shake them (see SPEC-seo-provisioning.md C1.1).
+//
+// CONSENT (SPEC-fleet-ux-funnel-measurement C3c)
+// ---------------------------------------------
+// GA4 ships with a consent-mode DEFAULT queued before gtag.js loads:
+// `analytics_storage` is granted unless the visitor declined (opt-out model,
+// localStorage 'rr-analytics-consent' === 'declined'); ad_storage,
+// ad_user_data and ad_personalization are always "denied".
+//
+// Clarity and the Meta pixel had no such mechanism: they were injected into
+// the head on page view, so a third-party script reached the visitor's
+// browser before anyone had agreed to anything. They are now injected on the
+// same consent GA4 uses — the existing `grantAnalyticsConsent` /
+// `denyAnalyticsConsent` hooks on `window`, which the consent banner already
+// calls. No second consent mechanism was invented.
+//
+// A visitor who accepted on an earlier visit is granted consent on the next
+// page load, before the vendor blocks are injected — otherwise the grant
+// would race the injection and the vendor would never load.
+//
+// GA4 EVENTS ARE NOT SUPPRESSED BEFORE CONSENT. GA4's consent mode already
+// drops what it must not store; suppressing the events in JS as well would
+// make the funnel measurable only for consented visitors and would hide the
+// consent rate itself (C3c.4). This file sends no GA4 events at all.
+
+interface Props {
+  measurementId?: string;
+  clarityId?: string;
+  pixelId?: string;
+}
+
+const { measurementId = '', clarityId = '', pixelId = '' } = Astro.props;
+
+const hasGa = Boolean(measurementId && measurementId.trim());
+const hasClarity = Boolean(clarityId && clarityId.trim());
+const hasPixel = Boolean(pixelId && pixelId.trim());
+---
+
+{/* No-op when neither ID is provisioned: both blocks render nothing. */}
+{hasGa && (
+  <>
+    {/* Queue consent defaults before loading the Google tag. */}
+    <script is:inline define:vars={{ measurementId }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+
+      // Astro wraps an `is:inline` script that uses `define:vars` in an IIFE,
+      // so `function gtag()` above is NOT a global on its own. gtag.js defines
+      // its own `window.gtag` only after the async tag script has loaded, and
+      // by then the page has already fired events (cta_view fires from an
+      // IntersectionObserver on first paint). Publishing the stub on `window`
+      // here means every caller uses gtag's real wire format — an Arguments
+      // object — even before the tag loads. Measured with a headless browser:
+      // calling this stub produced a /g/collect request with the right `en`,
+      // while the old `dataLayer.push(['event', ...])` fallback produced none.
+      window.gtag = gtag;
+
+      // OPT-OUT MODEL (decided 2026-10-30). Analytics storage is GRANTED unless
+      // this visitor has explicitly declined. The banner is an opt-out, and the
+      // privacy policy describes it that way. Advertising storage stays denied
+      // in every case: no ad personalisation, no ad signals, whatever the choice.
+      let analyticsConsent = 'granted';
+      try {
+        if (localStorage.getItem('rr-analytics-consent') === 'declined') analyticsConsent = 'denied';
+      } catch (_) { /* Private browsing may block storage; the opt-out default still applies. */ }
+      gtag('consent', 'default', {
+        analytics_storage: analyticsConsent,
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        wait_for_update: 500
+      });
+
+      gtag('js', new Date());
+      gtag('config', measurementId, { anonymize_ip: true });
+
+      // Call from a cookie-consent banner on accept:
+      //   window.grantAnalyticsConsent && window.grantAnalyticsConsent();
+      window.grantAnalyticsConsent = function () {
+        gtag('consent', 'update', {
+          analytics_storage: 'granted',
+          ad_storage: 'denied',
+          ad_user_data: 'denied',
+          ad_personalization: 'denied'
+        });
+      };
+      window.denyAnalyticsConsent = function () {
+        gtag('consent', 'update', { analytics_storage: 'denied', ad_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+      };
+    </script>
+    <script async src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}></script>
+  </>
+)}
+
+{/*
+  Clarity and the Meta pixel. Both are injected ONLY after consent, by the
+  same hook the consent banner already calls.
+
+  The grant hook is installed HERE, not only in the GA4 block: the banner
+  calls `window.grantAnalyticsConsent` unconditionally, and on a site with
+  Clarity but no GA4 there is no GA4 block to install it. Without this, the
+  banner's accept button would call nothing and Clarity would never load.
+
+  The stored choice is read here, before the loaders are registered, so a
+  returning visitor who already accepted does not have to press the button
+  again on every page. The key and its two values belong to the consent
+  banner; this only reads them.
+*/}
+{(hasClarity || hasPixel) && (
+  <script is:inline define:vars={{ clarityId, pixelId }}>
+    (() => {
+      const CONSENT_KEY = 'rr-analytics-consent';
+      const loaders = [];
+
+      if (clarityId) {
+        loaders.push(function loadClarity() {
+          if (window.__rrClarityLoaded) return;
+          window.__rrClarityLoaded = true;
+          (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+            t = l.createElement(r); t.async = 1;
+            t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0];
+            y.parentNode.insertBefore(t, y);
+          })(window, document, "clarity", "script", clarityId);
+        });
+      }
+
+      if (pixelId) {
+        loaders.push(function loadPixel() {
+          if (window.__rrPixelLoaded) return;
+          window.__rrPixelLoaded = true;
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', pixelId);
+          fbq('track', 'PageView');
+        });
+      }
+
+      // Accept: load the vendors, then hand the consent over to GA4's own
+      // hook if it is already installed.
+      const previousGrant = window.grantAnalyticsConsent;
+      window.grantAnalyticsConsent = function () {
+        if (previousGrant) previousGrant();
+        loaders.forEach(function (load) { load(); });
+        // A lead that arrived before consent was held. The pixel is here
+        // now, so the lead is reported.
+        if (window.__rrPixelPendingLead) {
+          window.__rrPixelPendingLead = false;
+          if (typeof window.fbq === 'function') window.fbq('track', 'Lead');
+        }
+      };
+
+      // Decline: nothing is loaded. GA4's own hook, if present, still runs.
+      const previousDeny = window.denyAnalyticsConsent;
+      window.denyAnalyticsConsent = function () {
+        if (previousDeny) previousDeny();
+      };
+
+      // A visitor who already accepted gets the vendors on this page load.
+      let stored = null;
+      try { stored = localStorage.getItem(CONSENT_KEY); } catch (_) { /* storage may be blocked */ }
+      if (stored === 'accepted') {
+        loaders.forEach(function (load) { load(); });
+        if (window.__rrPixelPendingLead) {
+          window.__rrPixelPendingLead = false;
+          if (typeof window.fbq === 'function') window.fbq('track', 'Lead');
+        }
+      }
+    })();
+  </script>
+)}
+
+{/*
+  The Meta `Lead` event (C3c.3). All 23 fleet sites carry the shared pixel id
+  `999120903204453` in data.json today, so this path is live fleet-wide, not
+  a future case: it has to report a lead on every site, or the pixel ships
+  and never reports one.
+
+  `window.rrTrack('generate_lead', ...)` is fired by the lead form after the
+  server accepts the lead, so the Lead event fires once per accepted lead and
+  never for a lead the server rejected. The pixel may not be loaded yet (the
+  visitor has not consented), so a lead that happens first is HELD rather
+  than reported — a visitor who never consents is never reported to Meta.
+*/}
+{hasPixel && (
+  <script is:inline define:vars={{ pixelId }}>
+    (() => {
+      const trackLead = function () {
+        if (typeof window.fbq !== 'function') {
+          window.__rrPixelPendingLead = true;
+          return;
+        }
+        window.fbq('track', 'Lead');
+      };
+
+      /*
+       * `window.rrTrack` is ASSIGNED by ConversionTracking.astro, which sits
+       * at the END of the body — after this script, which is in the head. A
+       * plain wrapper installed here would be overwritten and the Lead event
+       * would never fire. A property accessor is not: whoever assigns
+       * `window.rrTrack` later is captured, and the wrapper survives.
+       */
+      let inner = typeof window.rrTrack === 'function' ? window.rrTrack : null;
+      const wrapped = function (name, params) {
+        if (inner) inner(name, params);
+        if (name === 'generate_lead') trackLead();
+      };
+      Object.defineProperty(window, 'rrTrack', {
+        configurable: true,
+        get: function () { return wrapped; },
+        set: function (fn) { inner = fn; },
+      });
+    })();
+  </script>
+)}

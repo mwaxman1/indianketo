@@ -1,6 +1,8 @@
 ---
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
+import AnalyticsHead from "@/components/AnalyticsHead.astro";
+import ConsentBanner from "@/components/ConsentBanner.astro";
 import StructuredData from "@/components/StructuredData.astro";
 import { photo } from "@/data/photos";
 import "@/styles/global.css";
@@ -111,6 +113,8 @@ const ogImage = new URL(image, Astro.site).href;
       </>
     )}
     <slot name="head" />
+    <!-- GA4 with consent-mode defaults queued before gtag.js (fleet analytics standard). -->
+    <AnalyticsHead measurementId="G-TR0TGL1NGM" />
   </head>
   <body class="flex min-h-screen flex-col bg-cream font-body text-ink antialiased">
     <a
@@ -135,33 +139,9 @@ const ogImage = new URL(image, Astro.site).href;
       <slot />
     </main>
 
+    <ConsentBanner />
+
     {!hideGlobalNav && <Footer />}
 
-    <!-- Deferred GA4 -->
-    <script is:inline>
-      var gaId = 'G-TR0TGL1NGM';
-      function loadAnalytics() {
-        if (gaId && gaId !== 'G-XXXXXXXXXX') {
-          var s = document.createElement('script');
-          s.async = true;
-          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gaId;
-          document.head.appendChild(s);
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          window.gtag = gtag;
-          gtag('js', new Date());
-          gtag('config', gaId, {
-            page_title: document.title,
-            page_location: window.location.href,
-            send_page_view: true
-          });
-        }
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', loadAnalytics);
-      } else {
-        loadAnalytics();
-      }
-    </script>
   </body>
 </html>
