@@ -1,0 +1,232 @@
+---
+// ConversionTracking.astro — funnel events to GA4 and to the first-party ledger endpoint.
+// Mount as the LAST element before </body>, after AnalyticsHead. No imports, no bundler: one inline script.
+// The ledger is a HARD consent gate (localStorage 'rr-analytics-consent' === 'accepted'); GA4 relies on
+// consent mode in AnalyticsHead. `endpoint` is same-origin (credentials same-origin) or an https cross-origin
+// collector (credentials omit); anything else disables the ledger.
+interface Props {
+  endpoint?: string;
+  property?: string;
+}
+const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
+---
+
+{property && <span hidden data-analytics-site={property}></span>}
+<script is:inline define:vars={{ endpoint, property }}>
+  (function () {
+    var CONSENT_KEY = 'rr-analytics-consent';
+    var CONSENT_VERSION = 'rr-analytics-consent-v1';
+    var VID_KEY = 'rr-analytics-vid';
+    var SID_KEY = 'rr-analytics-sid';
+    var VISIT_KEY = 'rr-visit-' + property;
+    var SESSION_MS = 30 * 60 * 1000;
+    var VID_MS = 90 * 24 * 60 * 60 * 1000;
+    var BATCH = 20;
+    var MAX_RETRIES = 3;
+    var MAX_QUEUE = 200;
+    var VOCAB = ['page_view', 'cta_view', 'cta_click', 'form_start', 'form_submit', 'generate_lead'];
+
+    // Endpoint-aware credentials: same-origin keeps cookies; cross-origin must be https and never sends them.
+    var creds = null;
+    try {
+      var eu = new URL(endpoint, location.href);
+      creds = eu.origin === location.origin ? 'same-origin' : eu.protocol === 'https:' ? 'omit' : null;
+    } catch (_) {}
+    var ledger = !!(property && creds); // unsafe endpoint => ledger off: nothing queued, stored or sent
+
+    var queue = [];
+    var flushing = false;
+    var retries = 0;
+    var pageViewSent = false;
+    var flushTimer = null; // one pending debounced flush, or null
+
+    function hasConsent() {
+      try { return localStorage.getItem(CONSENT_KEY) === 'accepted'; } catch (_) { return false; }
+    }
+    function readJson(key) {
+      try { return JSON.parse(localStorage.getItem(key)); } catch (_) { return null; }
+    }
+    function uuid() {
+      return (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : 'x' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+    }
+
+    // Callers must have checked hasConsent(): this writes storage.
+    function ids() {
+      var now = Date.now();
+      var v = readJson(VID_KEY);
+      if (!v || !v.id || !(v.exp > now)) v = { id: uuid(), exp: now + VID_MS };
+      localStorage.setItem(VID_KEY, JSON.stringify(v));
+      var s = readJson(SID_KEY);
+      if (!s || !s.id || now - s.t > SESSION_MS) s = { id: uuid(), t: now };
+      s.t = now;
+      localStorage.setItem(SID_KEY, JSON.stringify(s));
+      return { vid: v.id, sid: s.id };
+    }
+
+    // {s: sessionCount, t: lastActivityMs}; returning = an earlier session exists. Consent holders only.
+    function isReturning() {
+      if (!ledger || !hasConsent()) return false;
+      try {
+        var now = Date.now();
+        var v = readJson(VISIT_KEY);
+        if (!v || typeof v.s !== 'number') v = { s: 1, t: now };
+        else if (now - v.t > SESSION_MS) v = { s: v.s + 1, t: now };
+        else v.t = now;
+        localStorage.setItem(VISIT_KEY, JSON.stringify(v));
+        return v.s > 1;
+      } catch (_) { return false; }
+    }
+
+    function device() {
+      var w = window.innerWidth;
+      var coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
+      return w < 640 ? 'mobile' : (w < 1024 || coarse) ? 'tablet' : 'desktop';
+    }
+
+    function ga4(name, payload) {
+      if (typeof window.gtag !== 'function' && Array.isArray(window.dataLayer)) {
+        window.gtag = function () { window.dataLayer.push(arguments); };
+      }
+      if (typeof window.gtag === 'function') window.gtag('event', name, payload);
+    }
+
+    function enqueue(name, payload) {
+      if (!ledger || !hasConsent()) return; // hard gate: nothing queued, stored or sent
+      queue.push({ name: name, timestamp: new Date().toISOString(), page_path: payload.page_path, properties: payload });
+      if (queue.length > MAX_QUEUE) queue.shift();
+      if (queue.length >= BATCH) flush(false);
+      if (!flushTimer) flushTimer = setTimeout(function () { flushTimer = null; flush(false); }, 700);
+    }
+
+    function flush(unloading) {
+      if (flushing || !queue.length) return;
+      if (!ledger || !hasConsent()) { clearTimeout(flushTimer); flushTimer = null; queue = []; return; } // withdrawn: discard and stop
+      clearTimeout(flushTimer); flushTimer = null; // sending now; a pending timer would fire into the next queue
+      flushing = true;
+      var batch = queue.slice(0, BATCH);
+      var id;
+      try { id = ids(); } catch (_) { flushing = false; return; }
+      var body = JSON.stringify({
+        site_token: property,
+        consent: { state: 'granted', version: CONSENT_VERSION },
+        visitor_id: id.vid,
+        session_id: id.sid,
+        events: batch
+      });
+      function fail() {
+        flushing = false;
+        if (unloading || retries >= MAX_RETRIES) return; // kept; next flush trigger tries again
+        retries += 1;
+        setTimeout(function () { flush(false); }, 1000 * Math.pow(2, retries - 1));
+      }
+      try {
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: body,
+          keepalive: true,
+          credentials: creds
+        }).then(function (res) {
+          if (res.status !== 202) return fail();
+          queue.splice(0, batch.length);
+          retries = 0;
+          flushing = false;
+          if (queue.length) flush(unloading);
+        }, fail);
+      } catch (_) { fail(); }
+    }
+
+    function track(name, params) {
+      try {
+        if (VOCAB.indexOf(name) < 0) return;
+        var payload = {};
+        params = params || {};
+        for (var k in params) if (k !== 'form' && Object.prototype.hasOwnProperty.call(params, k)) payload[k] = params[k];
+        var form = params.form;
+        if (form && form.nodeType === 1) {
+          var sel = form.querySelector('select[name=service]');
+          payload.form_id = form.id || '';
+          payload.service = (sel && sel.value) || form.dataset.leadService || '';
+          payload.field_count = form.elements ? form.elements.length : 0;
+        }
+        payload.page_path = location.pathname;
+        payload.device_category = device();
+        payload.is_returning = isReturning();
+        if (name !== 'page_view') ga4(name, payload); // gtag config already sends GA4's own page_view
+        enqueue(name, payload);
+      } catch (_) { /* analytics must never break the page */ }
+    }
+
+    // ASSIGNED, not defined: AnalyticsHead may have a get/set accessor on window.rrTrack.
+    window.rrTrack = track;
+
+    function sendPageView() {
+      if (pageViewSent || !hasConsent()) return;
+      pageViewSent = true;
+      track('page_view');
+    }
+
+    // Consent granted after load: same wrap pattern as AnalyticsHead.
+    function onConsentChange() {
+      try {
+        if (hasConsent()) sendPageView();
+        else { clearTimeout(flushTimer); flushTimer = null; queue = []; }
+      } catch (_) {}
+    }
+    var previousGrant = window.grantAnalyticsConsent;
+    window.grantAnalyticsConsent = function () {
+      try { if (previousGrant) previousGrant.apply(this, arguments); } finally {
+        onConsentChange();
+        setTimeout(onConsentChange, 0); // banner may write storage just after calling us
+      }
+    };
+    window.addEventListener('storage', function (e) {
+      if (e.key === CONSENT_KEY) onConsentChange();
+    });
+
+    // cta_view: once per data-cta-id per page view
+    try {
+      var seen = {};
+      var viewed = function (el) {
+        var id = el.getAttribute('data-cta-id');
+        if (!id || seen[id]) return;
+        seen[id] = true;
+        track('cta_view', { cta_id: id, cta_location: el.getAttribute('data-cta-location') || '' });
+      };
+      var ctas = document.querySelectorAll('[data-cta-id]');
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { viewed(en.target); io.unobserve(en.target); }
+          });
+        }, { threshold: 0.5 });
+        ctas.forEach(function (el) { io.observe(el); });
+      } else {
+        ctas.forEach(viewed);
+      }
+
+      document.addEventListener('click', function (e) {
+        try {
+          var el = e.target && e.target.closest && e.target.closest('[data-cta-id]');
+          if (el) track('cta_click', { cta_id: el.getAttribute('data-cta-id'), cta_location: el.getAttribute('data-cta-location') || '' });
+        } catch (_) {}
+      }, true);
+
+      var started = new WeakSet();
+      document.addEventListener('focusin', function (e) {
+        try {
+          var f = e.target && e.target.closest && e.target.closest('form[data-lead-form]');
+          if (f && !started.has(f)) { started.add(f); track('form_start', { form: f }); }
+        } catch (_) {}
+      });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') flush(true);
+      });
+      window.addEventListener('pagehide', function () { flush(true); });
+    } catch (_) {}
+
+    sendPageView();
+  })();
+</script>
