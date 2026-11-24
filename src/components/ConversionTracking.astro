@@ -26,6 +26,8 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     var BATCH = 20;
     var MAX_RETRIES = 3;
     var MAX_QUEUE = 200;
+    var MAX_REJECT_WARNS = 3; // page-side drops reach devtools, but a broken page cannot flood the console
+    var rejectWarns = 0;
     var VOCAB = ['page_view', 'cta_view', 'cta_click', 'form_start', 'form_submit', 'generate_lead', 'search', 'affiliate_click'];
 
     // Endpoint-aware credentials: same-origin keeps cookies; cross-origin must be https and never sends them.
@@ -150,6 +152,28 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
           keepalive: true,
           credentials: creds
         }).then(function (res) {
+          // Retry taxonomy. A 4xx is TERMINAL for this batch: the collector has judged these exact bytes and
+          // will answer the same way forever (400 site_token, 403 origin/consent, 404 endpoint, 413 too_large,
+          // 422 every event dropped as PII). Retrying it only blocks the events queued behind it, so drop the
+          // batch and let the rest of the page load through. 5xx and transport failures are transient and keep
+          // the batch for fail()'s backoff.
+          if (res.status >= 400 && res.status < 500) {
+            var dropped = batch.length;
+            queue.splice(0, dropped);
+            retries = 0;
+            flushing = false;
+            if (rejectWarns < MAX_REJECT_WARNS) {
+              rejectWarns += 1;
+              try {
+                if (typeof console !== 'undefined' && console && console.warn) {
+                  console.warn('[analytics] collector rejected the batch: HTTP ' + res.status +
+                    ', dropped ' + dropped + ' event(s), ' + queue.length + ' still queued');
+                }
+              } catch (_) {}
+            }
+            if (queue.length) flush(unloading);
+            return;
+          }
           if (res.status !== 202) return fail();
           queue.splice(0, batch.length);
           retries = 0;
