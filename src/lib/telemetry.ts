@@ -1,4 +1,4 @@
-// GENERATED from posthog-rollout/telemetry/telemetry.ts sha256:61dfee2b643bd7695fa819df2354556eccff9f89d03f5d0c3d4354370ae26fbc — edit there, then run sync-telemetry.sh
+// GENERATED from posthog-rollout/telemetry/telemetry.ts sha256:60ef41c690bb4c54da54f5260506e478c2d08e879054e82cb5bbc8f84df80a3f — edit there, then run sync-telemetry.sh
 // obx-telemetry v1 — the event contract, the PII guard and the PostHog forwarder (PLAN.md §3, §4).
 // Zero dependencies. Server-side only. Canonical copy lives in posthog-rollout/telemetry/; consumers get a
 // copy from scripts/sync-telemetry.sh — never edit a copy.
@@ -167,11 +167,14 @@ function findDenyKey(value: unknown, path = ''): string | null {
   return null;
 }
 
-/** True when any string in the tree (or a string value itself) is longer than `max`. */
-function hasLongString(value: unknown, max: number): boolean {
+/** True when any string in the tree (or a string value itself) is longer than `max`, or the tree is deeper
+ *  than MAX_DEPTH. The depth bound is what keeps a 32 KB body of `[[[[…` from overflowing the stack in
+ *  this or any later walker — a stack overflow leaves `fetch()` exactly like the coercion throw did. */
+function hasLongString(value: unknown, max: number, depth = 0): boolean {
+  if (depth > MAX_DEPTH) return true;
   if (typeof value === 'string') return value.length > max;
-  if (Array.isArray(value)) return value.some((v) => hasLongString(v, max));
-  if (value && typeof value === 'object') return Object.values(value).some((v) => hasLongString(v, max));
+  if (Array.isArray(value)) return value.some((v) => hasLongString(v, max, depth + 1));
+  if (value && typeof value === 'object') return Object.values(value).some((v) => hasLongString(v, max, depth + 1));
   return false;
 }
 
@@ -180,6 +183,45 @@ const MAX_SCAN = 1000; // the PII regexes are not linear; nothing legitimate in 
 const LEAD_REF_RE = /^[A-Z]{2,5}-[A-Z0-9]{4,8}$/;
 const RUN_ID_RE = /^ic-[0-9]{10}-[0-9a-f]{8}$/;
 const MAX_STR = 100;
+
+// ---------------------------------------------------------------------------
+// Caller-supplied values are read BY TYPE, never coerced.
+//
+// Every value under `props`, `page_path`, `occurred_at` and `distinct_id` is the caller's, and JS runs the
+// caller's own `toString` when asked to coerce it: `String({"toString":null})` throws
+// `TypeError: Cannot convert object to primitive value`. In the accept path that throw escapes the handler
+// — no 202, no 4xx and no log line — so no value from a request body is passed to `String()`, `Number()` or
+// `new Date()` unguarded. This is the contract the collector's logger already keeps (worker.js
+// `summarize()`): strings are used as bounded strings, `null`/`undefined` become a fixed token, and anything
+// else is only ever described by `type=<typeof>` and then dropped — never stringified.
+// ---------------------------------------------------------------------------
+
+/** The caller's text when it really is text, else ''. Replaces `String(x ?? '')` on caller values. */
+const textOr = (value: unknown): string => (typeof value === 'string' ? value : '');
+
+/** The length of a caller value's text — a string has one, nothing else does. Never coerces. */
+const textLength = (value: unknown): number => (typeof value === 'string' ? value.length : 0);
+
+/** A deeper tree is not a contract payload, and walking one risks a stack overflow — which is a throw too. */
+const MAX_DEPTH = 32;
+
+/**
+ * A browser-supplied `ts` / `occurred_at` is caller data as well, and `new Date(unknown)` coerces it (and
+ * throws on `{"toString":null}`). Rule: epoch MILLISECONDS as a number, or a date string, accepted only
+ * inside a plausible window. Anything else is unusable and the event is DROPPED rather than stamped; an
+ * omitted `ts` still means "server time now", which is the documented client shape.
+ *
+ * Why refusal instead of coercion for a numeric `2026`: `new Date(2026)` is 1970-01-01T00:00:02.026Z — a
+ * silently false timestamp in the ledger's only time dimension, in a system where nobody can go back and
+ * find it, and indistinguishable from tampering. A missing row is recoverable; a wrong-time row is not.
+ */
+const MIN_TS_MS = Date.parse('2020-01-01T00:00:00.000Z');
+const MAX_TS_MS = Date.parse('2100-01-01T00:00:00.000Z');
+
+function tsToMs(value: unknown): number {
+  const ms = typeof value === 'number' ? value : typeof value === 'string' ? Date.parse(value) : Number.NaN;
+  return Number.isFinite(ms) && ms >= MIN_TS_MS && ms <= MAX_TS_MS ? ms : Number.NaN;
+}
 
 /** Per-prop value rules beyond "short scalar". Returns the cleaned value, or undefined to strip the prop. */
 function cleanValue(key: string, v: unknown): unknown {
@@ -234,19 +276,26 @@ export function sanitize(
   if (!e || typeof e !== 'object') return { ok: false, reason: 'invalid' };
   if (typeof e.name !== 'string' || !Object.hasOwn(EVENTS, e.name)) return { ok: false, reason: 'unknown_event' };
   if (typeof e.distinct_id !== 'string' || !e.distinct_id || e.distinct_id.length > 128) return { ok: false, reason: 'invalid' };
-  if (typeof e.occurred_at !== 'string' || Number.isNaN(Date.parse(e.occurred_at))) return { ok: false, reason: 'invalid' };
+  // A non-string timestamp (a number, an object) is refused, never coerced — the contract field is a string.
+  // A parseable string outside the plausible window is refused too; see tsToMs(): a 1970 row is unfindable
+  // later, a missing one is not. The numeric form is only ever converted to ISO at the edge (collect()).
+  if (typeof e.occurred_at !== 'string' || !Number.isFinite(tsToMs(e.occurred_at))) return { ok: false, reason: 'invalid' };
   const raw = e.props && typeof e.props === 'object' && !Array.isArray(e.props) ? e.props : {};
 
   // Bound the work the regexes can be made to do before they run (values are cut to MAX_STR later anyway).
-  if (hasLongString(raw, MAX_SCAN) || String(e.distinct_id).length > MAX_SCAN || String(e.page_path ?? '').length > MAX_SCAN) {
+  // `distinct_id` is a proven string here; `page_path` may be anything the caller sent, so it is measured by
+  // its text length only when it has text — `String({"toString":null}).length` would throw the whole request.
+  if (hasLongString(raw, MAX_SCAN) || e.distinct_id.length > MAX_SCAN || textLength(e.page_path) > MAX_SCAN) {
     return { ok: false, reason: 'invalid' };
   }
   // PII first, over everything the client sent — including keys that would be stripped anyway.
   // A well-formed run_id (`ic-<10 digits>-<hex>`) is phone-shaped by construction, so it is checked by its
-  // pattern below instead of by findPii.
+  // pattern below instead of by findPii — but only when it IS a string: `String(scan.run_id)` on a hostile
+  // object throws before any PII decision can be written.
   const scan: Record<string, unknown> = { ...raw };
-  if (e.name === 'instrumentation_check' && RUN_ID_RE.test(String(scan.run_id))) delete scan.run_id;
-  if (findDenyKey(raw) || findPii(scan) || treeHasPii(scan) || stringHasPii(e.distinct_id) || stringHasPii(String(e.page_path ?? ''))) {
+  if (e.name === 'instrumentation_check' && typeof scan.run_id === 'string' && RUN_ID_RE.test(scan.run_id)) delete scan.run_id;
+  const path = textOr(e.page_path);
+  if (findDenyKey(raw) || findPii(scan) || treeHasPii(scan) || stringHasPii(e.distinct_id) || (path !== '' && stringHasPii(path))) {
     return { ok: false, reason: 'pii' };
   }
 
@@ -254,11 +303,12 @@ export function sanitize(
   const props: Record<string, unknown> = {};
   let stripped = 0;
   for (const [k, v] of Object.entries(raw)) {
+    // cleanValue is type-driven: a non-coercible object (or array, function, symbol) is stripped, never stringified.
     const cleaned = (allowed.includes(k) || (COMMON_PROPS as readonly string[]).includes(k)) ? cleanValue(k, v) : undefined;
     if (cleaned === undefined) stripped += 1;
     else props[k] = cleaned;
   }
-  if (e.name === 'instrumentation_check' && !RUN_ID_RE.test(String(props.run_id ?? ''))) {
+  if (e.name === 'instrumentation_check' && (typeof props.run_id !== 'string' || !RUN_ID_RE.test(props.run_id))) {
     return { ok: false, reason: 'invalid' };
   }
   const page_path = normPath(e.page_path);
@@ -309,7 +359,8 @@ const DEFAULT_HOST = 'https://us.i.posthog.com';
 export const LINES = ['rishi', 'rank_rent', 'local_smb', 'govcon', 'own_brand', 'client'] as const;
 export const STAGES = ['prebuilt', 'live', 'sold'] as const;
 function tag(v: string | undefined, allowed: readonly string[]): string {
-  const s = (v ?? '').trim();
+  // Env, not caller data — but this is the same rule: a value that is not a string is not trimmed, it is 'unset'.
+  const s = typeof v === 'string' ? v.trim() : '';
   return allowed.includes(s) ? s : 'unset';
 }
 
@@ -421,13 +472,21 @@ export async function collect(
   }
   if (!Array.isArray(list) || list.length > MAX_BATCH) return new Response(null, { status: 400 });
 
-  const events: ContractEvent[] = list.map((r: any) => ({
-    name: String(r?.name ?? ''),
-    occurred_at: r?.ts == null ? new Date().toISOString() : new Date(r.ts).toString() === 'Invalid Date' ? '' : new Date(r.ts).toISOString(),
-    distinct_id: String(r?.sid ?? ''),
-    page_path: r?.path,
-    props: r?.props,
-  }));
+  // Every field here is read by type, never coerced: `String(r?.name)` on a caller-supplied
+  // `{"toString":null}` throws out of the handler (no 202, no 4xx, no log line) on the path a real page
+  // posts to. A non-string name or sid becomes '' and the event is dropped as invalid/unknown downstream,
+  // and a `ts` that is not a number or date string inside the plausible window leaves occurred_at '' —
+  // the event is dropped rather than stamped with 1970.
+  const events: ContractEvent[] = list.map((r: any) => {
+    const ms = tsToMs(r?.ts);
+    return {
+      name: textOr(r?.name),
+      occurred_at: r?.ts === undefined || r?.ts === null ? new Date().toISOString() : Number.isFinite(ms) ? new Date(ms).toISOString() : '',
+      distinct_id: textOr(r?.sid),
+      page_path: r?.path,
+      props: r?.props,
+    };
+  });
   const result = await forward(events, {
     property: o.property,
     runtime: o.runtime,
