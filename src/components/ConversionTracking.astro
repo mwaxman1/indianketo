@@ -1,20 +1,30 @@
 ---
 // ConversionTracking.astro — funnel events to GA4 and to the first-party ledger endpoint.
 // Mount as the LAST element before </body>, after AnalyticsHead. No imports, no bundler: one inline script.
-// The ledger is a HARD consent gate (localStorage 'rr-analytics-consent' === 'accepted'); GA4 relies on
-// consent mode in AnalyticsHead. `endpoint` is same-origin (credentials same-origin) or an https cross-origin
-// collector (credentials omit); anything else disables the ledger.
+// `endpoint` is same-origin (credentials same-origin) or an https cross-origin collector (credentials omit);
+// anything else disables the ledger.
+//
+// `consent` is the property's storage/consent posture — choose it per property, never by accident:
+//   gate      (default) capture only after localStorage 'rr-analytics-consent' === 'accepted' (strict opt-in;
+//             pair with ConsentBanner + AnalyticsHead).
+//   notice    capture unless the visitor declined ('declined'); persistent ids. Use where the site shows an
+//             opt-out analytics notice, because that is what the notice promises.
+//   ephemeral capture immediately, mint a NEW random visitor id on every page load and write nothing to
+//             storage — the "persistence: memory" posture, for a site with no consent UI at all.
 // Every queued event carries the browser's coarse browser/OS family (browser_family / os_family): the server-side
 // forward cannot invent them, and without them PostHog's $browser / $os / $device_type stay null on every row.
 interface Props {
   endpoint?: string;
   property?: string;
+  consent?: 'gate' | 'notice' | 'ephemeral';
 }
-const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
+const { endpoint = '/api/analytics/events', property = '', consent = 'gate' } = Astro.props;
+// An unknown value must fail closed, not open: anything not understood is the strict opt-in gate.
+const consented = consent === 'notice' || consent === 'ephemeral' ? consent : 'gate';
 ---
 
 {property && <span hidden data-analytics-site={property}></span>}
-<script is:inline define:vars={{ endpoint, property }}>
+<script is:inline define:vars={{ endpoint, property, consented }}>
   (function () {
     var CONSENT_KEY = 'rr-analytics-consent';
     var CONSENT_VERSION = 'rr-analytics-consent-v1';
@@ -45,8 +55,14 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     var flushTimer = null; // one pending debounced flush, or null
     var explicitFormSubmit = (typeof WeakSet === 'function') ? new WeakSet() : null;
 
+    function readConsent() {
+      try { return localStorage.getItem(CONSENT_KEY); } catch (_) { return null; }
+    }
+    // gate = opt-in ('accepted' only). notice = opt-out (anything except 'declined'). ephemeral = no UI, no storage.
     function hasConsent() {
-      try { return localStorage.getItem(CONSENT_KEY) === 'accepted'; } catch (_) { return false; }
+      if (consented === 'ephemeral') return true;
+      var c = readConsent();
+      return consented === 'notice' ? c !== 'declined' : c === 'accepted';
     }
     function readJson(key) {
       try { return JSON.parse(localStorage.getItem(key)); } catch (_) { return null; }
@@ -59,6 +75,9 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     // Callers must have checked hasConsent(): this writes storage.
     function ids() {
       var now = Date.now();
+      // ephemeral: a fresh id per page load, nothing written. No identifier survives the page view, so the same
+      // visitor on two pages is two distinct ids — that is the trade for having no consent UI to ask.
+      if (consented === 'ephemeral') return { vid: uuid(), sid: uuid(), ephemeral: true };
       var v = readJson(VID_KEY);
       if (!v || !v.id || !(v.exp > now)) v = { id: uuid(), exp: now + VID_MS };
       localStorage.setItem(VID_KEY, JSON.stringify(v));
@@ -66,12 +85,12 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
       if (!s || !s.id || now - s.t > SESSION_MS) s = { id: uuid(), t: now };
       s.t = now;
       localStorage.setItem(SID_KEY, JSON.stringify(s));
-      return { vid: v.id, sid: s.id };
+      return { vid: v.id, sid: s.id, ephemeral: false };
     }
 
     // {s: sessionCount, t: lastActivityMs}; returning = an earlier session exists. Consent holders only.
     function isReturning() {
-      if (!ledger || !hasConsent()) return false;
+      if (!ledger || !hasConsent() || consented === 'ephemeral') return false;
       try {
         var now = Date.now();
         var v = readJson(VISIT_KEY);
@@ -116,7 +135,7 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     }
 
     function enqueue(name, payload) {
-      if (!ledger || !hasConsent()) return; // hard gate: nothing queued, stored or sent
+      if (!ledger || !hasConsent()) return; // posture gate: nothing queued, stored or sent
       queue.push({ name: name, timestamp: new Date().toISOString(), page_path: payload.page_path, properties: payload });
       if (queue.length > MAX_QUEUE) queue.shift();
       if (queue.length >= BATCH) flush(false);
@@ -152,12 +171,15 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
           keepalive: true,
           credentials: creds
         }).then(function (res) {
-          // Retry taxonomy. A 4xx is TERMINAL for this batch: the collector has judged these exact bytes and
-          // will answer the same way forever (400 site_token, 403 origin/consent, 404 endpoint, 413 too_large,
-          // 422 every event dropped as PII). Retrying it only blocks the events queued behind it, so drop the
-          // batch and let the rest of the page load through. 5xx and transport failures are transient and keep
-          // the batch for fail()'s backoff.
-          if (res.status >= 400 && res.status < 500) {
+          // Retry taxonomy. Most 4xx answers are TERMINAL for this batch: the collector has judged these exact
+          // bytes and will answer the same way forever (400 site_token, 403 origin/consent, 404 endpoint,
+          // 413 too_large, 422 every event dropped as PII). Retrying one only blocks the events queued behind
+          // it, so drop the batch and let the rest of the page load through.
+          //
+          // 429 is the exception: rate limiting says nothing about the events, only about timing, so the batch
+          // is kept and retried through fail()'s exponential backoff. Rate-limited events are exactly the ones
+          // worth redelivering. 5xx and transport failures are transient in the same way.
+          if (res.status >= 400 && res.status < 500 && res.status !== 429) {
             var dropped = batch.length;
             queue.splice(0, dropped);
             retries = 0;
