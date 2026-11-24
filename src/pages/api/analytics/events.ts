@@ -76,9 +76,10 @@ export const POST: APIRoute = async ({ request, site }) => {
   const events: ContractEvent[] = [];
   for (const e of raw as any[]) {
     if (!e || typeof e !== 'object' || typeof e.name !== 'string' || !Object.hasOwn(EVENTS, e.name)) continue;
+    const ts = typeof e.timestamp === 'string' ? e.timestamp : '';
     const s = sanitize({
       name: e.name,
-      occurred_at: String(e.timestamp ?? ''),
+      occurred_at: ts,
       distinct_id,
       page_path: e.page_path,
       props: e.properties,
