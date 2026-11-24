@@ -61,7 +61,8 @@ export const POST: APIRoute = async ({ request, site }) => {
 
   // 4. site token must be this deployment's own host (www. stripped)
   const property = (site?.host ?? '').replace(/^www\./, '');
-  if (!property || String(body.site_token ?? '').replace(/^www\./, '') !== property) {
+  const token = typeof body.site_token === 'string' ? body.site_token : '';
+  if (!property || token.replace(/^www\./, '') !== property) {
     return json(400, { ok: false, rejected: 'site_token' });
   }
 
