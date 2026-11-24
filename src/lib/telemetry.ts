@@ -1,4 +1,4 @@
-// GENERATED from posthog-rollout/telemetry/telemetry.ts sha256:8bc8ff38b264bf7973eaeea8b29c06201c1ec3dac8ef78245f2caa3f249b2408 — edit there, then run sync-telemetry.sh
+// GENERATED from posthog-rollout/telemetry/telemetry.ts sha256:61dfee2b643bd7695fa819df2354556eccff9f89d03f5d0c3d4354370ae26fbc — edit there, then run sync-telemetry.sh
 // obx-telemetry v1 — the event contract, the PII guard and the PostHog forwarder (PLAN.md §3, §4).
 // Zero dependencies. Server-side only. Canonical copy lives in posthog-rollout/telemetry/; consumers get a
 // copy from scripts/sync-telemetry.sh — never edit a copy.
@@ -116,6 +116,11 @@ export const EVENTS = {
   video_play: ['video_id'],
   video_complete: ['video_id'],
   guide_download: ['gated'],
+  // A site-search submission. The query is bounded; a PII-shaped query drops the whole event in sanitize.
+  search: ['search_query', 'search_source', 'results_count'],
+  // An outbound click on a link that pays. Only the partner slug and the placement — never the URL, because a
+  // URL carries the affiliate id and can carry a search term.
+  affiliate_click: ['partner', 'placement'],
   instrumentation_check: ['run_id'],
 } as const satisfies Record<string, readonly string[]>;
 
@@ -129,6 +134,9 @@ export interface ContractEvent {
   page_path?: string;
   props: Record<string, unknown>;
 }
+
+/** Props every event may carry: the collector's coarse read of the client, mapped to $browser/$os/$device_type. */
+const COMMON_PROPS = ['browser_family', 'os_family', 'device_category'] as const;
 
 /** Deny keys, compared lower-cased with `_` and `-` removed, at any depth (§3). Superset of PII_FIELDS. */
 const DENY_KEYS = new Set([
@@ -246,7 +254,7 @@ export function sanitize(
   const props: Record<string, unknown> = {};
   let stripped = 0;
   for (const [k, v] of Object.entries(raw)) {
-    const cleaned = allowed.includes(k) ? cleanValue(k, v) : undefined;
+    const cleaned = (allowed.includes(k) || (COMMON_PROPS as readonly string[]).includes(k)) ? cleanValue(k, v) : undefined;
     if (cleaned === undefined) stripped += 1;
     else props[k] = cleaned;
   }
@@ -337,7 +345,28 @@ export async function forward(events: ContractEvent[], o: ForwardOptions): Promi
       $process_person_profile: false,
       $geoip_disable: true,
     };
+    // A hand-rolled server-side POST gets NONE of the context posthog-js adds on the client, so every event
+    // arrived with $lib/$current_url/$host null and no site could be segmented from another. These are set
+    // explicitly, from data the collector already holds — `property` is the registry id, which for every live
+    // property is its apex domain.
+    properties.$lib = `obx-telemetry/${SCHEMA_VERSION}`;
+    const siteHost = /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/i.test(o.property) ? o.property : undefined;
     if (c.page_path) properties.$pathname = c.page_path;
+    if (siteHost) {
+      properties.$host = siteHost;
+      properties.$current_url = `https://${siteHost}${c.page_path ?? '/'}`;
+    }
+    // The browser is the one thing the server cannot invent. The collector forwards its own coarse reading
+    // (browser_family / os_family / device_category, allowlisted in sanitize via COMMON_PROPS) and it is mapped
+    // onto PostHog's own keys here. Never a full UA, never a fingerprint.
+    if (typeof c.props.browser_family === 'string' && c.props.browser_family) properties.$browser = c.props.browser_family;
+    if (typeof c.props.os_family === 'string' && c.props.os_family) properties.$os = c.props.os_family;
+    if (typeof c.props.device_category === 'string' && c.props.device_category) {
+      properties.$device_type = c.props.device_category;
+    }
+    // Agent probes live in the same project as customer traffic. They stay (they are the only end-to-end proof
+    // the hop works) but every one is stamped so an insight can exclude them: properties.obx_probe = true.
+    if (c.name === 'instrumentation_check') properties.obx_probe = true;
     batch.push({
       event: c.name,
       distinct_id: c.distinct_id,

@@ -4,6 +4,8 @@
 // The ledger is a HARD consent gate (localStorage 'rr-analytics-consent' === 'accepted'); GA4 relies on
 // consent mode in AnalyticsHead. `endpoint` is same-origin (credentials same-origin) or an https cross-origin
 // collector (credentials omit); anything else disables the ledger.
+// Every queued event carries the browser's coarse browser/OS family (browser_family / os_family): the server-side
+// forward cannot invent them, and without them PostHog's $browser / $os / $device_type stay null on every row.
 interface Props {
   endpoint?: string;
   property?: string;
@@ -24,7 +26,7 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     var BATCH = 20;
     var MAX_RETRIES = 3;
     var MAX_QUEUE = 200;
-    var VOCAB = ['page_view', 'cta_view', 'cta_click', 'form_start', 'form_submit', 'generate_lead'];
+    var VOCAB = ['page_view', 'cta_view', 'cta_click', 'form_start', 'form_submit', 'generate_lead', 'search', 'affiliate_click'];
 
     // Endpoint-aware credentials: same-origin keeps cookies; cross-origin must be https and never sends them.
     var creds = null;
@@ -39,6 +41,7 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
     var retries = 0;
     var pageViewSent = false;
     var flushTimer = null; // one pending debounced flush, or null
+    var explicitFormSubmit = (typeof WeakSet === 'function') ? new WeakSet() : null;
 
     function hasConsent() {
       try { return localStorage.getItem(CONSENT_KEY) === 'accepted'; } catch (_) { return false; }
@@ -82,6 +85,25 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
       var w = window.innerWidth;
       var coarse = window.matchMedia && matchMedia('(pointer:coarse)').matches;
       return w < 640 ? 'mobile' : (w < 1024 || coarse) ? 'tablet' : 'desktop';
+    }
+
+    // The one thing a server cannot infer about a visitor. Coarse, from the UA string only — no fingerprint, no
+    // full UA. The collector maps these onto PostHog's own $browser/$os, which a server-side POST otherwise loses.
+    function platform() {
+      var ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+      var b = /Edg\//.test(ua) ? 'Edge'
+        : /OPR\/|Opera/.test(ua) ? 'Opera'
+        : /Firefox\//.test(ua) ? 'Firefox'
+        : /Chrome\/|CriOS/.test(ua) ? 'Chrome'
+        : /Safari\//.test(ua) ? 'Safari'
+        : 'Other';
+      var o = /Windows/.test(ua) ? 'Windows'
+        : /iPhone|iPad|iPod/.test(ua) ? 'iOS'
+        : /Android/.test(ua) ? 'Android'
+        : /Mac OS X/.test(ua) ? 'Mac OS X'
+        : /Linux/.test(ua) ? 'Linux'
+        : 'Other';
+      return { browser_family: b, os_family: o };
     }
 
     function ga4(name, payload) {
@@ -137,7 +159,7 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
       } catch (_) { fail(); }
     }
 
-    function track(name, params) {
+    function track(name, params, ledgerOnly) {
       try {
         if (VOCAB.indexOf(name) < 0) return;
         var payload = {};
@@ -149,11 +171,23 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
           payload.form_id = form.id || '';
           payload.service = (sel && sel.value) || form.dataset.leadService || '';
           payload.field_count = form.elements ? form.elements.length : 0;
+          // An explicit rrTrack('form_submit', {form}) call wins: the passive submit listener defers by a tick
+          // and then skips this form, so one submission is one event either way.
+          if (name === 'form_submit' && explicitFormSubmit) explicitFormSubmit.add(form);
         }
         payload.page_path = location.pathname;
         payload.device_category = device();
+        var pf = platform();
+        payload.browser_family = pf.browser_family;
+        payload.os_family = pf.os_family;
         payload.is_returning = isReturning();
-        if (name !== 'page_view') ga4(name, payload); // gtag config already sends GA4's own page_view
+        // Passive emitters are ledger-only: the property site already sends its own GA4 event for the same click.
+        // A query string never reaches gtag — the ledger keeps it, sanitize() is the guard there.
+        if (name !== 'page_view' && !ledgerOnly) {
+          var g = {};
+          for (var gk in payload) if (gk !== 'search_query' && gk !== 'search_term' && Object.prototype.hasOwnProperty.call(payload, gk)) g[gk] = payload[gk];
+          ga4(name, g); // gtag config already sends GA4's own page_view
+        }
         enqueue(name, payload);
       } catch (_) { /* analytics must never break the page */ }
     }
@@ -220,6 +254,79 @@ const { endpoint = '/api/analytics/events', property = '' } = Astro.props;
           if (f && !started.has(f)) { started.add(f); track('form_start', { form: f }); }
         } catch (_) {}
       });
+
+      // lead_submit: every form marked data-lead-form, without touching the site's submit handler.
+      // Capture phase + deferred a tick, so a page that also calls rrTrack('form_submit') itself wins.
+      document.addEventListener('submit', function (e) {
+        try {
+          var f = e.target;
+          if (!f || f.nodeType !== 1 || !f.matches || !f.matches('form[data-lead-form]')) return;
+          setTimeout(function () {
+            try { if (!explicitFormSubmit || !explicitFormSubmit.has(f)) track('form_submit', { form: f }); } catch (_) {}
+          }, 0);
+        } catch (_) {}
+      }, true);
+
+      // search: a site-search form that already exists. The query is bounded and never sent for a
+      // PII-shaped string — sanitize drops the whole event rather than storing an address or phone.
+      document.addEventListener('submit', function (e) {
+        try {
+          var f = e.target;
+          if (!f || f.nodeType !== 1 || !f.matches || !f.matches('form[role=search], form[data-site-search]')) return;
+          // data-tracking-manual="true": the site tracks this form itself — emit nothing, not even to the ledger.
+          if ((f.getAttribute('data-tracking-manual') || '').toLowerCase() === 'true') return;
+          var i = f.querySelector('input[type=search], input[name=q], input[name=s], input[name=query]');
+          var v = (i && i.value) || '';
+          if (!v) return;
+          track('search', {
+            search_query: v.slice(0, 80),
+            search_source: f.getAttribute('data-site-search') || 'site'
+          }, true);
+        } catch (_) {}
+      }, true);
+
+      // affiliate_click: an outbound link marked data-affiliate="<partner>", or one that is recognisably an
+      // affiliate/tracked outbound link. Only the partner slug and the placement are sent — never the URL,
+      // which is where an affiliate id or a search term would leak.
+      // The selector also covers non-anchor controls — a button that opens the buy URL itself — so a sticky
+      // buy bar marked data-affiliate still reaches the ledger. data-tracking-manual="true" still wins.
+      var AFFILIATE_HOSTS = ['amzn.to', 'amazon.', 'awin1.com', 'shareasale.com', 'impact.com', 'anrdoezrs.net',
+        'dpbolvw.net', 'jdoqocy.com', 'kqzyfj.com', 'tkqlhce.com', 'cj.com', 'rakuten.com', 'click.linksynergy.com',
+        'goto.walmart.com', 'rover.ebay.com', 'prf.hn', 'partnerize.com', 'sovrn.com', 'viglink.com'];
+      function affiliatePartner(a) {
+        var marked = (a.getAttribute('data-affiliate') || '').trim();
+        // data-affiliate="true" is a marker, not a partner slug: fall through to the href/host derivation.
+        if (marked && marked.toLowerCase() !== 'true') return marked;
+        var href = a.getAttribute('href') || '';
+        if (!/^https?:/i.test(href)) return '';
+        var host, query;
+        try { var u = new URL(href, location.href); host = u.hostname.toLowerCase(); query = u.search.toLowerCase(); }
+        catch (_) { return ''; }
+        if (host === location.hostname) return '';
+        // Amazon Associates: the tag=<id>-20 parameter is the referral marker.
+        if (/[?&]tag=[a-z0-9-]+-20\b/.test(query)) return 'amazon';
+        for (var k = 0; k < AFFILIATE_HOSTS.length; k += 1) {
+          var pat = AFFILIATE_HOSTS[k];
+          if (pat.indexOf('.') === pat.length - 1 ? host.indexOf(pat) === 0 : host === pat || host.slice(-(pat.length + 1)) === '.' + pat) {
+            return host.replace(/^www\./, '').split('.')[0] || 'affiliate';
+          }
+        }
+        return '';
+      }
+      document.addEventListener('click', function (e) {
+        try {
+          var a = e.target && e.target.closest && e.target.closest('a[href], [data-affiliate]');
+          if (!a) return;
+          // data-tracking-manual="true": the site tracks this link itself — emit nothing, not even to the ledger.
+          if ((a.getAttribute('data-tracking-manual') || '').toLowerCase() === 'true') return;
+          var partner = affiliatePartner(a);
+          if (!partner) return;
+          track('affiliate_click', {
+            partner: String(partner).slice(0, 40),
+            placement: a.getAttribute('data-affiliate-placement') || a.getAttribute('data-cta-location') || 'link'
+          }, true);
+        } catch (_) {}
+      }, true);
 
       document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'hidden') flush(true);
